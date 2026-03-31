@@ -1,0 +1,95 @@
+{% extends "admin/base.html" %}
+{% block title %}Events{% endblock %}
+{% block page_title %}Events{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Manage upcoming and past school events.</p>
+  <button class="btn-maroon" onclick="openEventModal()"><i class="bi bi-plus-lg me-2"></i>New Event</button>
+</div>
+<div class="card-admin">
+  {% if events is defined and events %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Event</th><th>Date</th><th>Time</th><th>Venue</th><th>Category</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for ev in events %}
+      <tr id="ev-{{ ev._id }}">
+        <td><span style="font-weight:600;color:var(--maroon-deep)">{{ ev.title }}</span>{% if ev.get('description') %}<br><small style="color:#999">{{ ev.description[:60] }}…</small>{% endif %}</td>
+        <td style="font-size:13px;color:var(--text-mid)">{{ ev.date }}</td>
+        <td style="font-size:13px;color:var(--text-muted)">{{ ev.get('time','—') }}</td>
+        <td style="font-size:13px;color:var(--text-muted)">{{ ev.get('venue','—') }}</td>
+        <td><span style="background:var(--maroon-light);color:var(--maroon);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">{{ ev.get('category','General') }}</span></td>
+        <td style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-edit edit-event-btn" title="Edit"
+            data-id="{{ ev._id }}"
+            data-title="{{ ev.title }}"
+            data-date="{{ ev.date }}"
+            data-time="{{ ev.get('time','') }}"
+            data-venue="{{ ev.get('venue','') }}"
+            data-category="{{ ev.get('category','General') }}"
+            data-description="{{ ev.get('description','') }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_event', id=ev._id) }}','ev-{{ ev._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-calendar3"></i><h6>No events yet</h6><p>Add your first event to display it on the website.</p></div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalTitle">New Event</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_event') }}">
+          <input type="hidden" name="event_id" id="event_id">
+          <div class="mb-3"><label class="form-label">Event Title *</label><input type="text" name="title" id="ev_title" class="form-control" required></div>
+          <div class="row g-3 mb-3">
+            <div class="col-6"><label class="form-label">Date *</label><input type="date" name="date" id="ev_date" class="form-control" required></div>
+            <div class="col-6"><label class="form-label">Time</label><input type="time" name="time" id="ev_time" class="form-control"></div>
+          </div>
+          <div class="mb-3"><label class="form-label">Venue</label><input type="text" name="venue" id="ev_venue" class="form-control" placeholder="e.g. School Hall"></div>
+          <div class="mb-3"><label class="form-label">Category</label>
+            <select name="category" id="ev_cat" class="form-select">{% for c in ['Academic','Sports','Cultural','Religious','Community','General'] %}<option>{{ c }}</option>{% endfor %}</select>
+          </div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea name="description" id="ev_desc" class="form-control" rows="3"></textarea></div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px"><i class="bi bi-check-lg me-2"></i>Save Event</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openEventModal() {
+  document.getElementById('eventModalTitle').textContent = 'New Event';
+  document.getElementById('event_id').value = '';
+  ['ev_title','ev_date','ev_time','ev_venue','ev_desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ev_cat').value = 'General';
+  new bootstrap.Modal(document.getElementById('eventModal')).show();
+}
+document.querySelectorAll('.edit-event-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('eventModalTitle').textContent = 'Edit Event';
+    document.getElementById('event_id').value = d.id;
+    document.getElementById('ev_title').value = d.title;
+    document.getElementById('ev_date').value = d.date;
+    document.getElementById('ev_time').value = d.time;
+    document.getElementById('ev_venue').value = d.venue;
+    document.getElementById('ev_cat').value = d.category;
+    document.getElementById('ev_desc').value = d.description;
+    new bootstrap.Modal(document.getElementById('eventModal')).show();
+  });
+});
+</script>
+{% endblock %}

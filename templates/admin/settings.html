@@ -1,0 +1,154 @@
+{% extends "admin/base.html" %}
+{% block title %}Site Settings{% endblock %}
+{% block page_title %}Site Settings{% endblock %}
+{% block content %}
+<form method="POST" action="{{ url_for('admin.save_settings') }}" enctype="multipart/form-data">
+<div class="row g-4">
+
+  <div class="col-lg-8">
+    <!-- School Info -->
+    <div class="card-admin mb-4">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--maroon-light)"><i class="bi bi-building me-2" style="color:var(--maroon)"></i>School Information</h5>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">School Name</label><input type="text" name="school_name" class="form-control" value="{{ settings.get('school_name','MPSK') }}"></div>
+        <div class="col-md-6"><label class="form-label">Year Founded</label><input type="text" name="founded" class="form-control" value="{{ settings.get('founded','2002') }}"></div>
+        <div class="col-12"><label class="form-label">Tagline / Motto</label><input type="text" name="tagline" class="form-control" value="{{ settings.get('tagline','Education in Biblical Perspective') }}"></div>
+        <div class="col-12"><label class="form-label">Short About Text (Footer)</label><textarea name="about_short" class="form-control" rows="3">{{ settings.get('about_short','') }}</textarea></div>
+        <div class="col-12"><label class="form-label">Hero Text (Homepage)</label><textarea name="hero_text" class="form-control" rows="2">{{ settings.get('hero_text','') }}</textarea></div>
+        <div class="col-12"><div style="background:var(--maroon-light);border-radius:8px;padding:14px 16px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:var(--maroon-deep);margin-bottom:10px"><i class="bi bi-images me-2"></i>Hero Background Images — Upload or URL</div>
+        <div class="row g-3">
+        {% for i, label in [('1','Main background (large)'), ('2','Mosaic top-right'), ('3','Mosaic bottom-right')] %}
+        <div class="col-12">
+          <label class="form-label" style="font-size:11px;font-weight:700">Hero Image {{ i }} — {{ label }}</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            {% set cur = settings.get('hero_image_' + i, '') %}
+            {% if cur %}
+            <div style="width:70px;height:50px;border-radius:6px;overflow:hidden;flex-shrink:0;border:2px solid var(--border)">
+              <img src="{{ cur }}" style="width:100%;height:100%;object-fit:cover">
+            </div>
+            {% endif %}
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:11px;color:#999;margin-bottom:4px">Upload file:</div>
+              <input type="file" name="hero_image_{{ i }}_file" class="form-control form-control-sm" accept="image/*">
+            </div>
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:11px;color:#999;margin-bottom:4px">Or paste URL:</div>
+              <input type="url" name="hero_image_{{ i }}" class="form-control form-control-sm" placeholder="https://images.unsplash.com/..." value="{{ cur if not cur.startswith('/static/uploads/') else '' }}">
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        </div>
+        <p style="font-size:11px;color:#aaa;margin:10px 0 0"><i class="bi bi-info-circle me-1"></i>File upload takes priority over URL. Or use the <a href="{{ url_for('admin.image_manager') }}" style="color:var(--maroon)">Image Manager</a> for a dedicated image control panel.</p>
+        </div></div>
+        <div class="col-md-4"><label class="form-label">Students Count (stat)</label><input type="text" name="stat_students" class="form-control" value="{{ settings.get('stat_students','600') }}"></div>
+        <div class="col-md-4"><label class="form-label">Teachers Count (stat)</label><input type="text" name="stat_teachers" class="form-control" value="{{ settings.get('stat_teachers','45') }}"></div>
+        <div class="col-md-4"><label class="form-label">Years Active (stat)</label><input type="text" name="stat_years" class="form-control" value="{{ settings.get('stat_years','20') }}"></div>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="card-admin mb-4">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--maroon-light)"><i class="bi bi-telephone me-2" style="color:var(--maroon)"></i>Contact Details</h5>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" name="phone" class="form-control" value="{{ settings.get('phone','') }}"></div>
+        <div class="col-md-6"><label class="form-label">Email Address</label><input type="email" name="email" class="form-control" value="{{ settings.get('email','') }}"></div>
+        <div class="col-12"><label class="form-label">Physical Address</label><textarea name="address" class="form-control" rows="2">{{ settings.get('address','') }}</textarea></div>
+        <div class="col-md-6"><label class="form-label">WhatsApp Number (digits only)</label><input type="text" name="whatsapp" class="form-control" placeholder="254729223370" value="{{ settings.get('whatsapp','') }}"></div>
+        <div class="col-md-6"><label class="form-label">M-Pesa Paybill Number</label><input type="text" name="mpesa_paybill" class="form-control" value="{{ settings.get('mpesa_paybill','') }}"></div>
+      </div>
+    </div>
+
+    <!-- Social -->
+    <div class="card-admin mb-4">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--maroon-light)"><i class="bi bi-share me-2" style="color:var(--maroon)"></i>Social Media Links</h5>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label"><i class="bi bi-facebook me-1" style="color:#1877F2"></i>Facebook URL</label><input type="url" name="facebook" class="form-control" value="{{ settings.get('facebook','') }}"></div>
+        <div class="col-md-6"><label class="form-label"><i class="bi bi-twitter-x me-1"></i>Twitter/X URL</label><input type="url" name="twitter" class="form-control" value="{{ settings.get('twitter','') }}"></div>
+        <div class="col-md-6"><label class="form-label"><i class="bi bi-instagram me-1" style="color:#E1306C"></i>Instagram URL</label><input type="url" name="instagram" class="form-control" value="{{ settings.get('instagram','') }}"></div>
+        <div class="col-md-6"><label class="form-label"><i class="bi bi-youtube me-1" style="color:#FF0000"></i>YouTube URL</label><input type="url" name="youtube" class="form-control" value="{{ settings.get('youtube','') }}"></div>
+      </div>
+    </div>
+
+    <!-- Announcement Banner -->
+    <div class="card-admin mb-4">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--maroon-light)"><i class="bi bi-megaphone me-2" style="color:var(--maroon)"></i>Announcement Banner</h5>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px">A dismissible banner shown at the top of every public page. Use for term dates, admissions open, important notices.</p>
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-check form-switch mb-1">
+            <input class="form-check-input" type="checkbox" name="announcement_active" id="annToggle" {% if settings.get('announcement_active') %}checked{% endif %} style="width:40px;height:22px;cursor:pointer">
+            <label class="form-check-label" for="annToggle" style="font-size:13.5px;margin-left:8px;font-weight:600">Enable Banner</label>
+          </div>
+        </div>
+        <div class="col-12"><label class="form-label">Banner Message *</label><input type="text" name="announcement_text" class="form-control" placeholder="e.g. Admissions for 2026 are now open! Apply before 31 March." value="{{ settings.get('announcement_text','') }}"></div>
+        <div class="col-md-4"><label class="form-label">Icon <span style="font-size:11px;color:#aaa">(Bootstrap Icons name)</span></label><input type="text" name="announcement_icon" class="form-control" placeholder="e.g. info-circle" value="{{ settings.get('announcement_icon','megaphone') }}"></div>
+        <div class="col-md-4"><label class="form-label">Background Colour</label><input type="color" name="announcement_color" class="form-control form-control-color w-100" value="{{ settings.get('announcement_color','#6B1E2E') }}"></div>
+        <div class="col-md-4"><label class="form-label">Link Text</label><input type="text" name="announcement_link_text" class="form-control" placeholder="e.g. Apply Now" value="{{ settings.get('announcement_link_text','Learn more') }}"></div>
+        <div class="col-12"><label class="form-label">Link URL <span style="font-size:11px;color:#aaa">(optional)</span></label><input type="url" name="announcement_link" class="form-control" placeholder="https://mpsk.ac.ke/admissions" value="{{ settings.get('announcement_link','') }}"></div>
+      </div>
+    </div>
+
+    <!-- SEO Settings -->
+    <div class="card-admin">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--maroon-light)"><i class="bi bi-search me-2" style="color:var(--maroon)"></i>SEO &amp; Meta</h5>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px">Controls how search engines and social media platforms display the site.</p>
+      <div class="row g-3">
+        <div class="col-12"><label class="form-label">Meta Description <span style="font-size:11px;color:#aaa">(150–160 chars)</span></label><textarea name="meta_description" class="form-control" rows="2" maxlength="160" placeholder="A short description of your school for Google search results.">{{ settings.get('meta_description','') }}</textarea><div style="font-size:11px;color:#aaa;text-align:right;margin-top:2px" id="metaCharCount">{{ settings.get('meta_description','')|length }}/160</div></div>
+        <div class="col-12"><label class="form-label">Meta Keywords <span style="font-size:11px;color:#aaa">(comma-separated)</span></label><input type="text" name="meta_keywords" class="form-control" placeholder="MPSK, Kabarak, CBC school Kenya, Christian primary school" value="{{ settings.get('meta_keywords','') }}"></div>
+        <div class="col-md-6"><label class="form-label">Google Analytics ID <span style="font-size:11px;color:#aaa">(G-XXXXXXXX)</span></label><input type="text" name="ga_id" class="form-control" placeholder="G-XXXXXXXXXX" value="{{ settings.get('ga_id','') }}"></div>
+        <div class="col-md-6"><label class="form-label">Google Maps Embed URL</label><input type="url" name="google_maps" class="form-control" placeholder="https://maps.app.goo.gl/..." value="{{ settings.get('google_maps','') }}"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-admin mb-4">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:16px">Save Changes</h5>
+      <button type="submit" class="btn-maroon" style="width:100%;padding:13px;font-size:15px">
+        <i class="bi bi-save me-2"></i>Save All Settings
+      </button>
+      <p style="font-size:12px;color:#999;text-align:center;margin-top:10px">Changes are applied immediately across the site.</p>
+    </div>
+
+    <div class="card-admin mb-4" style="border:2px solid var(--maroon-light)">
+      <h6 style="font-weight:700;color:var(--maroon-deep);margin-bottom:8px"><i class="bi bi-images me-2" style="color:var(--maroon)"></i>Image Manager</h6>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">Control every image on the website — hero, staff, banners, logos, social previews — with upload or URL.</p>
+      <a href="{{ url_for('admin.image_manager') }}" class="btn-maroon" style="width:100%;padding:10px;font-size:13.5px;text-align:center;display:block;text-decoration:none">
+        <i class="bi bi-image me-2"></i>Open Image Manager
+      </a>
+
+    <div class="card-admin mb-4">
+      <h6 style="font-weight:700;color:var(--maroon-deep);margin-bottom:12px">Maintenance Mode</h6>
+      <div class="form-check form-switch mb-2">
+        <input class="form-check-input" type="checkbox" name="maintenance" id="maintToggle" {% if settings.get('maintenance') %}checked{% endif %} style="width:40px;height:22px;cursor:pointer">
+        <label class="form-check-label" for="maintToggle" style="font-size:13.5px;margin-left:8px">Enable Maintenance Mode</label>
+      </div>
+      <p style="font-size:12px;color:#999">When enabled, visitors see the maintenance page instead of the site.</p>
+    </div>
+
+    <div class="card-admin">
+      <h6 style="font-weight:700;color:var(--maroon-deep);margin-bottom:12px">Admin Password</h6>
+      <div class="mb-3"><label class="form-label">New Password</label><input type="password" name="new_password" class="form-control" placeholder="Leave blank to keep current"></div>
+      <div class="mb-2"><label class="form-label">Confirm Password</label><input type="password" name="confirm_password" class="form-control"></div>
+    </div>
+  </div>
+
+</div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const metaTA = document.querySelector('textarea[name="meta_description"]');
+const metaCount = document.getElementById('metaCharCount');
+if (metaTA && metaCount) {
+  metaTA.addEventListener('input', () => {
+    const len = metaTA.value.length;
+    metaCount.textContent = len + '/160';
+    metaCount.style.color = len > 155 ? '#ef4444' : len > 130 ? '#f59e0b' : '#aaa';
+  });
+}
+</script>
+{% endblock %}

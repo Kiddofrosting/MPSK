@@ -1,0 +1,17 @@
+{% extends "public/base.html" %}
+{% block title %}Unsubscribed — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block content %}
+<section class="section-padding">
+  <div class="container text-center">
+    <div class="col-lg-5 mx-auto">
+      <i class="bi bi-check-circle-fill" style="font-size:4rem;color:var(--green-primary)"></i>
+      <h2 style="font-family:var(--font-serif);color:var(--maroon-deep);margin-top:20px">Successfully Unsubscribed</h2>
+      {% if email %}
+      <p style="color:var(--text-muted);margin-top:12px"><strong>{{ email }}</strong> has been removed from the MPSK newsletter list.</p>
+      {% endif %}
+      <p style="color:var(--text-muted);font-size:14px">You will no longer receive emails from us. If this was a mistake, please re-subscribe using the form on our homepage.</p>
+      <a href="{{ url_for('public.index') }}" class="btn-primary-school mt-4 d-inline-block">Back to Home</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

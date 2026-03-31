@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% block title %}Inquiries{% endblock %}
+{% block page_title %}Admission Inquiries{% endblock %}
+{% block content %}
+<div class="card-admin">
+  {% if inquiries is defined and inquiries %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Parent</th><th>Child</th><th>Grade</th><th>Boarding</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for inq in inquiries %}
+      <tr id="inq-{{ inq._id }}">
+        <td>
+          <div style="font-weight:600;color:var(--maroon-deep)">{{ inq.parent_name }}</div>
+          <div style="font-size:12px;color:#999"><a href="mailto:{{ inq.email }}" style="color:var(--maroon)">{{ inq.email }}</a></div>
+          <div style="font-size:12px;color:#999"><a href="tel:{{ inq.phone }}" style="color:#666">{{ inq.phone }}</a></div>
+        </td>
+        <td style="font-weight:500">{{ inq.child_name }}<br><small style="color:#999">Age: {{ inq.get('child_age','—') }}</small></td>
+        <td><span style="background:var(--maroon-light);color:var(--maroon);border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:700">{{ inq.grade_applying }}</span></td>
+        <td style="font-size:13px">{{ inq.get('boarding','No') }}</td>
+        <td style="font-size:12px;color:#999">{{ inq.date.strftime('%d %b %Y') if inq.date else '—' }}</td>
+        <td>
+          <span class="badge-status badge-{{ inq.get('status','new') }}">{{ inq.get('status','new')|capitalize }}</span>
+        </td>
+        <td>
+          <div class="d-flex gap-1">
+            <button onclick="markReviewed('{{ inq._id }}')" class="tbl-btn tbl-btn-view" title="Mark Reviewed"><i class="bi bi-check2"></i></button>
+            <button onclick="deleteItem('{{ url_for('admin.delete_inquiry', id=inq._id) }}','inq-{{ inq._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+      {% if inq.get('message') %}
+      <tr style="background:#fafafa">
+        <td colspan="7" style="font-size:13px;color:var(--text-muted);padding-left:20px;padding-top:4px;padding-bottom:8px"><i class="bi bi-chat-dots me-2" style="color:var(--maroon)"></i>{{ inq.message }}</td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-person-plus"></i><h6>No inquiries yet</h6><p>Admission enquiries from the website will appear here.</p></div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+async function markReviewed(id) {
+  try {
+    const res = await fetch(`/admin/inquiries/${id}/review`, { method:'POST' });
+    const data = await res.json();
+    if (data.success) showToast('Marked as reviewed.', 'success');
+  } catch { showToast('Error.', 'danger'); }
+}
+</script>
+{% endblock %}

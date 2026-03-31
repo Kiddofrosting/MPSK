@@ -1,0 +1,695 @@
+{% extends "public/base.html" %}
+{% from "public/macros.html" import img, has_img, simg, person_photo %}
+{% block title %}{{ settings.get('school_name','MPSK') }} — {{ settings.get('tagline','Excellence Through Faith') }}{% endblock %}
+{% block meta_desc %}{{ settings.get('hero_text','Moi Primary & Junior School Kabarak — CBC education from PP1 to Grade 9, rooted in Christian values on the Kabarak University campus.') }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── HOMEPAGE-ONLY PREMIUM STYLES ─────────────────────────────── */
+
+/* HERO v2 — Editorial split */
+.hero-v2{position:relative;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.hero-v2-left{position:relative;background:var(--maroon-deep);display:flex;flex-direction:column;justify-content:center;padding:110px 64px 100px;z-index:2}
+.hero-v2-left::after{content:'';position:absolute;top:0;right:-55px;bottom:0;width:110px;clip-path:polygon(0 0,50% 0,100% 50%,50% 100%,0 100%);background:var(--maroon-deep);z-index:3}
+.hero-v2-right{position:relative;overflow:hidden}
+.hero-photo-grid{position:absolute;inset:0;display:grid;grid-template-columns:3fr 2fr;grid-template-rows:1fr 1fr;gap:4px}
+.hero-photo-grid .ph{overflow:hidden;position:relative}
+.hero-photo-grid .ph img{width:100%;height:100%;object-fit:cover;transition:transform 8s ease;display:block}
+.hero-photo-grid .ph:first-child{grid-row:1/3}
+.hero-photo-grid .ph::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(61,12,24,.25),transparent 60%);pointer-events:none}
+.hero-photo-badge{position:absolute;bottom:28px;left:28px;background:rgba(255,255,255,.97);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 36px rgba(0,0,0,.22);z-index:10;max-width:300px}
+.hero-photo-badge-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--maroon),var(--maroon-deep));display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold);flex-shrink:0}
+.hero-photo-badge-text strong{display:block;font-size:15px;font-weight:800;color:var(--maroon-deep);font-family:var(--font-serif)}
+.hero-photo-badge-text span{font-size:11.5px;color:var(--text-muted)}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(201,148,58,.18);border:1px solid rgba(201,148,58,.45);color:var(--gold-bright);padding:6px 18px;border-radius:99px;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:28px}
+.hero-pill::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gold-bright);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-v2-title{font-family:var(--font-serif);font-size:clamp(2.8rem,4.5vw,5rem);font-weight:800;color:#fff;line-height:1.04;letter-spacing:-.5px;margin-bottom:24px}
+.hero-v2-title .accent{color:var(--gold-bright);display:block}
+.hero-v2-sub{font-size:1.02rem;color:rgba(255,255,255,.72);line-height:1.78;max-width:440px;margin-bottom:40px}
+.hero-v2-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:52px}
+.hero-v2-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.1);padding-top:32px}
+.hstat{flex:1;padding-right:24px;margin-right:24px;border-right:1px solid rgba(255,255,255,.1)}
+.hstat:last-child{border-right:none;padding-right:0;margin-right:0}
+.hstat-num{font-family:var(--font-serif);font-size:2rem;font-weight:800;color:var(--gold-bright);line-height:1}
+.hstat-lbl{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+
+/* Info bar */
+.info-bar-v2{background:var(--maroon);border-top:3px solid var(--gold);padding:18px 0}
+.ibar-item{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.88);font-size:12.5px;padding:0 24px;border-right:1px solid rgba(255,255,255,.14)}
+.ibar-item:last-child{border-right:none}
+.ibar-item i{color:var(--gold-bright);font-size:16px;flex-shrink:0}
+
+/* BENTO WHY */
+.bento-why{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.bento-card{background:#fff;border-radius:20px;border:1px solid var(--border-light);overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative}
+.bento-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.bento-card.bento-feature{grid-column:1/3;display:flex;align-items:stretch}
+.bento-feature-img{width:48%;flex-shrink:0;overflow:hidden}
+.bento-feature-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.bento-card.bento-feature:hover .bento-feature-img img{transform:scale(1.05)}
+.bento-feature-body{flex:1;padding:40px 36px;display:flex;flex-direction:column;justify-content:center}
+.bento-feature-body h3{font-family:var(--font-serif);font-size:1.7rem;color:var(--maroon-deep);margin-bottom:12px}
+.bento-feature-body p{font-size:14px;color:var(--text-muted);line-height:1.75;margin-bottom:20px}
+.bento-card.bento-stat{background:linear-gradient(145deg,var(--maroon-deep),var(--maroon));border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;min-height:220px}
+.bento-stat-num{font-family:var(--font-serif);font-size:3.8rem;font-weight:800;color:var(--gold-bright);line-height:1}
+.bento-stat-lbl{font-size:12px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:1px;margin-top:8px}
+.bento-card.bento-icon-card{padding:36px 30px}
+.bento-icon-card .bi-icon{width:60px;height:60px;border-radius:16px;background:var(--maroon-light);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--maroon);margin-bottom:18px;transition:all .28s}
+.bento-icon-card:hover .bi-icon{background:linear-gradient(135deg,var(--maroon),var(--maroon-deep));color:var(--gold)}
+.bento-icon-card h5{font-family:var(--font-serif);font-size:1.15rem;color:var(--maroon-deep);margin-bottom:8px}
+.bento-icon-card p{font-size:13.5px;color:var(--text-muted);line-height:1.68;margin:0}
+.bento-card.bento-photo{overflow:hidden;min-height:280px}
+.bento-photo img{width:100%;height:100%;object-fit:cover;transition:transform .6s;display:block}
+.bento-card.bento-photo:hover img{transform:scale(1.06)}
+.bento-photo-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(61,12,24,.88),transparent);padding:24px 20px 16px;color:#fff;font-family:var(--font-serif);font-size:1.1rem;font-weight:700}
+.bento-card.bento-verse{background:linear-gradient(135deg,var(--gold-pale),#fff);border:1.5px solid rgba(201,148,58,.35);padding:36px 28px;display:flex;flex-direction:column;justify-content:center}
+.bento-verse blockquote{font-family:var(--font-serif);font-size:1.05rem;font-style:italic;color:var(--maroon-deep);line-height:1.75;border:none;padding:0;margin:0 0 14px}
+.bento-verse cite{font-size:12px;color:var(--gold);font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:.8px}
+
+/* EDITORIAL NEWS */
+.news-editorial{display:grid;grid-template-columns:1.4fr 1fr;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.news-editorial-main{position:relative;overflow:hidden;min-height:500px;display:block}
+.news-editorial-main img{width:100%;height:100%;object-fit:cover;transition:transform .7s;display:block}
+.news-editorial-main:hover img{transform:scale(1.04)}
+.news-editorial-main-body{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(20,4,12,.9) 0%,rgba(20,4,12,.5) 50%,transparent 100%);padding:40px 36px 32px;color:#fff}
+.news-editorial-cat{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold-bright);background:rgba(201,148,58,.2);border:1px solid rgba(201,148,58,.4);padding:4px 14px;border-radius:99px;display:inline-block;margin-bottom:14px}
+.news-editorial-title{font-family:var(--font-serif);font-size:1.9rem;font-weight:800;line-height:1.22;margin-bottom:12px}
+.news-editorial-meta{font-size:12px;color:rgba(255,255,255,.6)}
+.news-editorial-sidebar{display:flex;flex-direction:column;background:#fff}
+.news-sidebar-item{display:flex;gap:16px;padding:22px 24px;border-bottom:1px solid var(--border-light);transition:background .2s;text-decoration:none}
+.news-sidebar-item:last-child{border-bottom:none}
+.news-sidebar-item:hover{background:var(--maroon-pale)}
+.news-sidebar-thumb{width:84px;height:76px;border-radius:12px;overflow:hidden;flex-shrink:0}
+.news-sidebar-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.news-sidebar-item:hover .news-sidebar-thumb img{transform:scale(1.08)}
+.news-sidebar-cat{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--maroon);margin-bottom:5px}
+.news-sidebar-title{font-family:var(--font-serif);font-size:.95rem;font-weight:700;color:var(--maroon-deep);line-height:1.3;margin-bottom:6px}
+.news-sidebar-date{font-size:11.5px;color:var(--text-muted)}
+
+/* GALLERY IMMERSIVE */
+.gallery-immersive{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:260px 260px;gap:8px}
+.gallery-immersive .gi{position:relative;overflow:hidden;border-radius:16px;cursor:pointer}
+.gallery-immersive .gi:first-child{grid-row:1/3}
+.gallery-immersive .gi img{width:100%;height:100%;object-fit:cover;transition:transform .55s;display:block}
+.gallery-immersive .gi:hover img{transform:scale(1.08)}
+.gi-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(61,12,24,.8) 0%,transparent 55%);opacity:0;transition:opacity .32s;display:flex;flex-direction:column;justify-content:flex-end;padding:18px}
+.gallery-immersive .gi:hover .gi-overlay{opacity:1}
+.gi-cat{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold-bright);margin-bottom:4px}
+.gi-title{color:#fff;font-weight:600;font-size:13.5px;font-family:var(--font-serif)}
+.gi-zoom{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--maroon);display:flex;align-items:center;justify-content:center;font-size:15px;opacity:0;transform:scale(.7);transition:all .25s}
+.gallery-immersive .gi:hover .gi-zoom{opacity:1;transform:scale(1)}
+
+/* ACHIEVEMENTS FULLBLEED */
+.achievements-fullbleed{position:relative;overflow:hidden;padding:80px 0}
+.achievements-fullbleed::before{content:'';position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=1600&q=40');background-size:cover;background-position:center;opacity:.08}
+.achievements-fullbleed::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,var(--maroon-deep) 0%,rgba(61,12,24,.85) 50%,var(--green-deep) 100%)}
+.achievements-fullbleed .container{position:relative;z-index:2}
+.ach-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:30px 22px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.ach-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-bright));transform:scaleX(0);transition:transform .35s}
+.ach-card:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);transform:translateY(-6px)}
+.ach-card:hover::before{transform:scaleX(1)}
+.ach-card .ach-icon{font-size:2.2rem;color:var(--gold-bright);margin-bottom:10px;display:block}
+.ach-card .ach-year{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold)}
+.ach-card .ach-name{font-family:var(--font-serif);font-size:1.05rem;color:#fff;font-weight:700;margin:8px 0 5px;line-height:1.3}
+.ach-card .ach-desc{font-size:12px;color:rgba(255,255,255,.55);line-height:1.6}
+
+/* TESTIMONIAL MAGAZINE */
+.test-mag-wrap{display:grid;grid-template-columns:1fr 1fr;border-radius:22px;overflow:hidden;box-shadow:var(--shadow-xl)}
+.test-mag-panel{background:linear-gradient(160deg,var(--maroon-deep),var(--maroon));padding:64px 52px;position:relative;overflow:hidden}
+.test-mag-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(201,148,58,.2),transparent 55%)}
+.test-mag-panel .big-quote{font-family:var(--font-serif);font-size:9rem;color:rgba(201,148,58,.18);line-height:.5;position:absolute;top:32px;left:40px}
+.test-mag-content{position:relative;z-index:2}
+.test-mag-stars{color:var(--gold-bright);font-size:16px;margin-bottom:20px}
+.test-mag-text{font-family:var(--font-serif);font-size:1.3rem;font-style:italic;color:rgba(255,255,255,.95);line-height:1.72;margin-bottom:32px}
+.test-mag-author{display:flex;align-items:center;gap:16px}
+.test-mag-avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-bright));display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:1.3rem;color:var(--maroon-deep);font-weight:800;overflow:hidden;flex-shrink:0}
+.test-mag-avatar img{width:100%;height:100%;object-fit:cover}
+.test-mag-name{font-weight:700;color:#fff;font-size:14px}
+.test-mag-role{font-size:12px;color:rgba(255,255,255,.55)}
+.test-mag-list{background:#fff;padding:0}
+.test-mini-card{padding:24px 32px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .2s;position:relative}
+.test-mini-card:last-child{border-bottom:none}
+.test-mini-card:hover{background:var(--maroon-pale)}
+.test-mini-card.active{background:var(--maroon-pale)}
+.test-mini-card.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,var(--maroon),var(--gold));border-radius:0 2px 2px 0}
+.test-mini-stars{color:var(--gold);font-size:11px;margin-bottom:5px}
+.test-mini-text{font-size:13px;color:var(--text-mid);font-style:italic;line-height:1.6;margin-bottom:8px}
+.test-mini-name{font-size:12px;font-weight:700;color:var(--maroon-deep)}
+.test-mini-role{font-size:11px;color:var(--text-muted)}
+
+/* QUICK LINKS */
+.ql-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ql-btn{background:#fff;border:1px solid var(--border-light);border-radius:14px;padding:20px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;transition:all .28s;text-decoration:none}
+.ql-btn:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);border-color:var(--maroon);background:var(--maroon-pale)}
+.ql-btn i{font-size:26px;color:var(--maroon);width:52px;height:52px;border-radius:14px;background:var(--maroon-light);display:flex;align-items:center;justify-content:center;transition:all .28s}
+.ql-btn:hover i{background:linear-gradient(135deg,var(--maroon),var(--maroon-deep));color:var(--gold)}
+.ql-btn span{font-size:12.5px;font-weight:600;color:var(--dark)}
+
+/* CAMPUS CTA */
+.campus-cta{position:relative;min-height:540px;display:flex;align-items:center;overflow:hidden}
+.campus-cta-bg{position:absolute;inset:0}
+.campus-cta-bg img{width:100%;height:100%;object-fit:cover;display:block}
+.campus-cta-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(61,12,24,.96) 0%,rgba(61,12,24,.8) 40%,rgba(61,12,24,.3) 70%,transparent 100%)}
+.campus-cta .container{position:relative;z-index:2}
+.campus-cta-content{max-width:560px}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .hero-v2-left{padding:80px 40px}
+  .bento-why{grid-template-columns:1fr 1fr}
+  .bento-card.bento-feature{grid-column:1/3}
+}
+@media(max-width:991px){
+  .hero-v2{grid-template-columns:1fr;min-height:auto}
+  .hero-v2-left{padding:80px 30px 60px}
+  .hero-v2-left::after{display:none}
+  .hero-v2-right{min-height:420px}
+  .news-editorial{grid-template-columns:1fr}
+  .news-editorial-main{min-height:340px}
+  .test-mag-wrap{grid-template-columns:1fr}
+  .bento-why{grid-template-columns:1fr}
+  .bento-card.bento-feature{grid-column:auto;flex-direction:column}
+  .bento-feature-img{width:100%;height:240px}
+  .gallery-immersive{grid-template-columns:1fr 1fr;grid-template-rows:220px 220px}
+  .gallery-immersive .gi:first-child{grid-row:auto;grid-column:1/3}
+  .ql-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .hero-v2-title{font-size:2.4rem}
+  .hero-v2-stats{flex-wrap:wrap;gap:16px}
+  .hstat{border-right:none;flex:0 0 48%}
+  .ibar-item{padding:0 14px;font-size:11.5px}
+  .gallery-immersive{grid-template-columns:1fr 1fr;grid-template-rows:180px 180px}
+  .campus-cta{min-height:420px}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ══ HERO v2 — Editorial Split ══════════════════════════════════════════════ #}
+<section class="hero-v2">
+  <div class="hero-v2-left fade-up">
+    <div class="hero-pill">
+      <i class="bi bi-patch-check-fill me-1"></i>
+      CBC Accredited · Kabarak University Campus
+    </div>
+    <h1 class="hero-v2-title">
+      Where Faith<br>Meets
+      <span class="accent">Excellence</span>
+    </h1>
+    <p class="hero-v2-sub">
+      {{ settings.get('hero_text', 'Moi Primary & Junior School Kabarak delivers holistic, Christ-centred CBC education from PP1 to Grade 9 — nurturing every child\'s mind, character, and calling.') }}
+    </p>
+    <div class="hero-v2-actions">
+      <a href="{{ url_for('public.admissions') }}" class="btn-hero-primary">
+        <i class="bi bi-person-plus-fill me-2"></i>Enrol Your Child
+      </a>
+      <a href="{{ url_for('public.about') }}" class="btn-hero-outline">
+        <i class="bi bi-play-circle me-2"></i>Our Story
+      </a>
+    </div>
+    <div class="hero-v2-stats">
+      {% for num, lbl in [
+        (settings.get('stats_students','800+'), 'Students'),
+        (settings.get('stats_teachers','45+'), 'Educators'),
+        (settings.get('stats_years','30+'), 'Years'),
+        (settings.get('stats_pass_rate','100%'), 'Pass Rate'),
+      ] %}
+      <div class="hstat">
+        <div class="hstat-num">{{ num }}</div>
+        <div class="hstat-lbl">{{ lbl }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="hero-v2-right">
+    {% set hero_imgs = [
+      settings.get('hero_image_1','https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=900&q=80'),
+      settings.get('hero_image_2','https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=700&q=80'),
+      settings.get('hero_image_3','https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=700&q=80'),
+    ] %}
+    <div class="hero-photo-grid">
+      <div class="ph"><img src="{{ hero_imgs[0] }}" alt="MPSK students" loading="eager"></div>
+      <div class="ph"><img src="{{ hero_imgs[1] }}" alt="Students reading" loading="eager"></div>
+      <div class="ph"><img src="{{ hero_imgs[2] }}" alt="Sports day" loading="eager"></div>
+    </div>
+    {% if settings.get('admissions_open') == 'true' %}
+    <div class="hero-photo-badge fade-up" data-delay="400">
+      <div class="hero-photo-badge-icon"><i class="bi bi-mortarboard-fill"></i></div>
+      <div class="hero-photo-badge-text">
+        <strong>Admissions Open</strong>
+        <span>{{ settings.get('current_term','Term 2 2025') }} — Apply today</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{# ══ INFO BAR ══════════════════════════════════════════════════════════════ #}
+<div class="info-bar-v2">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-center flex-wrap">
+      <div class="ibar-item"><i class="bi bi-geo-alt-fill"></i><span>Kabarak University Campus, Nakuru County</span></div>
+      <div class="ibar-item"><i class="bi bi-clock-fill"></i><span>Mon–Fri · 6:30 AM – 5:00 PM</span></div>
+      <div class="ibar-item d-none d-md-flex"><i class="bi bi-telephone-fill"></i><span>{{ settings.get('phone','+254 727 733 113') }}</span></div>
+      <div class="ibar-item d-none d-lg-flex"><i class="bi bi-award-fill"></i><span>CBC Accredited · 100% Pass Rate 2024</span></div>
+    </div>
+  </div>
+</div>
+
+{# ══ TICKER ════════════════════════════════════════════════════════════════ #}
+<div class="ticker-wrap">
+  <div class="ticker-label">Latest</div>
+  {% set ticker_items = [
+    ('trophy-fill','100% CBC Pass Rate 2024'),
+    ('music-note-beamed','Nakuru County Music Champions'),
+    ('flask','National Science Fair Finalists'),
+    ('award','Regional Athletics Champions'),
+    ('laptop','Ministry of Education Digital Pioneer Award'),
+    ('calendar-event', settings.get('current_term','Term 2 2025') + ' — Admissions Open'),
+    ('geo-alt-fill','Kabarak University Campus, Nakuru County'),
+    ('telephone-fill', settings.get('phone','+254 727 733 113')),
+  ] %}
+  <div class="ticker-track">
+    {% for icon,text in ticker_items %}<div class="ticker-item"><i class="bi bi-{{ icon }}"></i>{{ text }}</div>{% endfor %}
+    {% for icon,text in ticker_items %}<div class="ticker-item"><i class="bi bi-{{ icon }}"></i>{{ text }}</div>{% endfor %}
+  </div>
+</div>
+
+{# ══ WHY MPSK — BENTO ══════════════════════════════════════════════════════ #}
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="row align-items-end mb-5">
+      <div class="col-lg-7 fade-up">
+        <span class="section-tag">Why Choose Us</span>
+        <h2 class="section-title">A Foundation Built to Last</h2>
+        <div class="section-divider left"></div>
+        <p class="section-desc">On the Kabarak University campus, your child grows within a safe, values-driven community that prepares them for a life of purpose.</p>
+      </div>
+      <div class="col-lg-5 text-lg-end fade-up" data-delay="100">
+        <a href="{{ url_for('public.about') }}" class="btn-primary-school">Discover MPSK <i class="bi bi-arrow-right ms-2"></i></a>
+      </div>
+    </div>
+
+    <div class="bento-why">
+      <div class="bento-card bento-feature fade-up">
+        <div class="bento-feature-img">
+          <img src="{{ simg(settings,'hero_image_1','https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80') }}" alt="Students" loading="lazy">
+        </div>
+        <div class="bento-feature-body">
+          <div class="section-tag mb-3">Our Mission</div>
+          <h3>Holistic CBC Excellence on a Uniquely Blessed Campus</h3>
+          <p>Set on Kabarak University's sprawling campus, MPSK combines CBC's competency-based vision with over 30 years of Christ-centred schooling. Every learner is known by name, nurtured by faith, and challenged to excel.</p>
+          <a href="{{ url_for('public.academics') }}" style="color:var(--maroon);font-weight:700;font-size:13.5px">Explore CBC Curriculum <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+      <div class="bento-card bento-stat fade-up" data-delay="80">
+        <div class="bento-stat-num">{{ settings.get('stats_pass_rate','100%') }}</div>
+        <div class="bento-stat-lbl">CBC Pass Rate<br>2024 Cohort</div>
+        <div style="margin-top:18px"><i class="bi bi-trophy-fill" style="font-size:2.2rem;color:var(--gold-bright);opacity:.7"></i></div>
+      </div>
+
+      {% for icon, title, desc in [
+        ('bi-shield-check-fill','Safe &amp; Nurturing','Supervised every hour on a secure campus that feels like a second home — dedicated, caring staff at every turn.'),
+        ('bi-book-half','CBC Excellence','Holistic competency-based education developing critical thinkers, creators, and compassionate global citizens.'),
+        ('bi-heart-pulse-fill','Whole-Child Wellbeing','Counselling, nutrition, pastoral care, and extracurricular programmes developing every dimension of growth.'),
+        ('bi-laptop','Modern Facilities','Computer lab, science rooms, library, chapel, sports fields, and well-equipped classrooms.'),
+      ] %}
+      <div class="bento-card bento-icon-card fade-up" data-delay="{{ loop.index0 * 80 }}">
+        <div class="bi-icon"><i class="bi {{ icon }}"></i></div>
+        <h5>{{ title }}</h5>
+        <p>{{ desc }}</p>
+      </div>
+      {% endfor %}
+
+      <div class="bento-card bento-photo fade-up" data-delay="160">
+        <img src="{{ simg(settings,'hero_image_2','https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80') }}" alt="Reading" loading="lazy">
+        <div class="bento-photo-label">Experienced, Caring Faculty</div>
+      </div>
+
+      <div class="bento-card bento-verse fade-up" data-delay="200">
+        <i class="bi bi-book-open-fill mb-3" style="font-size:1.8rem;color:var(--gold)"></i>
+        <blockquote>"Train up a child in the way he should go; even when he is old he will not depart from it."</blockquote>
+        <cite>— Proverbs 22:6 · MPSK Foundation Verse</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ══ ACHIEVEMENTS ══════════════════════════════════════════════════════════ #}
+{% if achievements %}
+<section class="achievements-fullbleed">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-5 fade-up">
+      <div>
+        <span class="section-tag section-tag-light">Our Track Record</span>
+        <h2 class="section-title section-title-light mt-2">Recent Achievements</h2>
+      </div>
+      <a href="{{ url_for('public.about') }}" style="color:var(--gold-bright);font-weight:600;font-size:13.5px">View All <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+    <div class="row g-3">
+      {% for a in achievements %}
+      <div class="col-6 col-md-4 col-lg-2 fade-up" data-delay="{{ loop.index0 * 60 }}">
+        <div class="ach-card">
+          <i class="bi bi-{{ a.get('icon','trophy') }} ach-icon"></i>
+          {% if a.get('year') %}<div class="ach-year">{{ a.year }}</div>{% endif %}
+          <div class="ach-name">{{ a.title }}</div>
+          <div class="ach-desc">{{ a.get('description','') }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ══ EDITORIAL NEWS ════════════════════════════════════════════════════════ #}
+{% if news %}
+<section class="section-padding">
+  <div class="container">
+    <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+      <div class="fade-up">
+        <span class="section-tag">News &amp; Updates</span>
+        <h2 class="section-title">Latest from MPSK</h2>
+        <div class="section-divider left"></div>
+      </div>
+      <a href="{{ url_for('public.news') }}" class="btn-primary-school fade-up" data-delay="100">All News <i class="bi bi-arrow-right ms-2"></i></a>
+    </div>
+
+    <div class="news-editorial fade-up">
+      {% set featured = news[0] %}
+      {% set fsrc = featured.get('image_url') or (url_for('static',filename='uploads/'+featured.image) if featured.get('image') else '') %}
+      <a href="{{ url_for('public.news_detail', slug=featured.slug) }}" class="news-editorial-main">
+        {% if fsrc %}<img src="{{ fsrc }}" alt="{{ featured.title }}" loading="lazy">
+        {% else %}<div style="background:linear-gradient(145deg,var(--maroon),var(--maroon-deep));width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i class="bi bi-newspaper" style="font-size:5rem;color:rgba(255,255,255,.2)"></i></div>{% endif %}
+        <div class="news-editorial-main-body">
+          <span class="news-editorial-cat">{{ featured.get('category','News') }}</span>
+          <div class="news-editorial-title">{{ featured.title }}</div>
+          <div class="news-editorial-meta"><i class="bi bi-calendar3 me-1"></i>{{ featured.date.strftime('%d %B %Y') if featured.date else '' }} <span class="mx-2">·</span> Read full story →</div>
+        </div>
+      </a>
+      <div class="news-editorial-sidebar">
+        {% for item in news[1:4] %}
+        {% set src = item.get('image_url') or (url_for('static',filename='uploads/'+item.image) if item.get('image') else '') %}
+        <a href="{{ url_for('public.news_detail', slug=item.slug) }}" class="news-sidebar-item">
+          <div class="news-sidebar-thumb">
+            {% if src %}<img src="{{ src }}" alt="{{ item.title }}" loading="lazy">
+            {% else %}<div style="width:100%;height:100%;background:var(--maroon-light);display:flex;align-items:center;justify-content:center"><i class="bi bi-newspaper" style="font-size:1.5rem;color:var(--maroon)"></i></div>{% endif %}
+          </div>
+          <div>
+            <div class="news-sidebar-cat">{{ item.get('category','News') }}</div>
+            <div class="news-sidebar-title">{{ item.title }}</div>
+            <div class="news-sidebar-date"><i class="bi bi-calendar3 me-1"></i>{{ item.date.strftime('%d %b %Y') if item.date else '' }}</div>
+          </div>
+        </a>
+        {% endfor %}
+        <div style="padding:20px 24px;background:var(--cream)">
+          <a href="{{ url_for('public.news') }}" class="btn-primary-school d-block text-center" style="font-size:13px;padding:10px 16px">View All News <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ══ GALLERY ═══════════════════════════════════════════════════════════════ #}
+{% if gallery %}
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+      <div class="fade-up">
+        <span class="section-tag">Life at MPSK</span>
+        <h2 class="section-title">School Gallery</h2>
+        <div class="section-divider left"></div>
+        <p class="section-desc">A glimpse into the vibrant life on our Kabarak campus.</p>
+      </div>
+      <a href="{{ url_for('public.gallery') }}" class="btn-primary-school fade-up" data-delay="100">View All <i class="bi bi-images ms-2"></i></a>
+    </div>
+    <div class="gallery-immersive fade-up">
+      {% for item in gallery[:6] %}
+      {% set src = item.get('image_url') or (url_for('static',filename='uploads/'+item.image) if item.get('image') else '') %}
+      {% if src %}
+      <div class="gi" data-lightbox="{{ src }}" data-caption="{{ item.title }} — {{ item.get('category','') }}">
+        <img src="{{ src }}" alt="{{ item.title }}" loading="lazy">
+        <div class="gi-overlay"><div class="gi-cat">{{ item.get('category','') }}</div><div class="gi-title">{{ item.title }}</div></div>
+        <div class="gi-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ══ EVENTS + QUICK LINKS ══════════════════════════════════════════════════ #}
+<section class="section-padding">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-7 fade-up">
+        <span class="section-tag">Upcoming</span>
+        <h2 class="section-title mb-0">School Calendar</h2>
+        <div class="section-divider left"></div>
+        {% if events %}
+        <div class="bg-white rounded-4 p-4" style="box-shadow:var(--shadow-sm);border:1px solid var(--border-light)">
+          {% set months = {'01':'Jan','02':'Feb','03':'Mar','04':'Apr','05':'May','06':'Jun','07':'Jul','08':'Aug','09':'Sep','10':'Oct','11':'Nov','12':'Dec'} %}
+          {% for ev in events %}
+          <div class="event-item">
+            <div class="event-date-box">
+              <span class="event-date-day">{{ ev.date[8:10] if ev.date else '—' }}</span>
+              <span class="event-date-mon">{{ months.get(ev.date[5:7],'') if ev.date else '' }}</span>
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center flex-wrap gap-2">
+                <div class="event-title">{{ ev.title }}</div>
+                {% if ev.get('category') %}<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 10px;border-radius:99px;background:{% if ev.category=='term' %}var(--green-light);color:var(--green){% elif ev.category=='break' %}var(--gold-pale);color:var(--gold){% else %}var(--maroon-light);color:var(--maroon){% endif %}">{{ ev.category }}</span>{% endif %}
+              </div>
+              {% if ev.get('description') %}<div class="event-desc">{{ ev.description }}</div>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+          <a href="{{ url_for('public.events') }}" class="btn-primary-school d-inline-block mt-3">Full Calendar <i class="bi bi-calendar3 ms-2"></i></a>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-4 p-5 text-center" style="color:var(--text-muted);border:1px solid var(--border-light)">
+          <i class="bi bi-calendar-x" style="font-size:2.5rem;opacity:.3"></i>
+          <p class="mt-2 mb-0">No upcoming events. Check back soon.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-5 fade-up" data-delay="200">
+        <span class="section-tag">Parent Access</span>
+        <h2 class="section-title mb-0">Quick Links</h2>
+        <div class="section-divider left"></div>
+        <div class="ql-grid">
+          {% for icon, label, href in [
+            ('bi-mortarboard-fill','Admissions',url_for('public.admissions')),
+            ('bi-cash-coin','Fees',url_for('public.admissions')+'#fees'),
+            ('bi-journal-text','Curriculum',url_for('public.academics')),
+            ('bi-images','Gallery',url_for('public.gallery')),
+            ('bi-question-circle','FAQs',url_for('public.faq')),
+            ('bi-envelope-at','Contact',url_for('public.contact')),
+          ] %}
+          <a href="{{ href }}" class="ql-btn">
+            <i class="bi {{ icon }}"></i>
+            <span>{{ label }}</span>
+          </a>
+          {% endfor %}
+        </div>
+        <div class="mt-4 p-4 rounded-4" style="background:linear-gradient(135deg,var(--maroon),var(--maroon-deep));color:#fff">
+          <i class="bi bi-book-open-fill" style="font-size:1.6rem;color:var(--gold-bright)"></i>
+          <p class="mt-2 mb-1" style="font-family:var(--font-serif);font-style:italic;font-size:1rem;color:rgba(255,255,255,.9);line-height:1.7">"Train up a child in the way he should go, and when he is old he will not depart from it."</p>
+          <small style="color:var(--gold-bright);font-weight:700">— Proverbs 22:6</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ══ STAFF ═════════════════════════════════════════════════════════════════ #}
+{% if staff %}
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Meet Our Team</span>
+      <h2 class="section-title">Dedicated Educators</h2>
+      <div class="section-divider"></div>
+      <p class="section-desc mx-auto">Our teachers are mentors, coaches, and champions for every child's potential.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      {% for member in staff %}
+      <div class="col-sm-6 col-md-4 col-lg-2 fade-up" data-delay="{{ loop.index0 * 80 }}">
+        <div class="staff-card h-100">
+          <div class="staff-photo-wrap">
+            {% set psrc = person_photo(member) %}
+            {% if psrc %}<img src="{{ psrc }}" class="staff-photo" alt="{{ member.name }}" loading="lazy">
+            {% else %}<div class="staff-photo-placeholder">{{ member.name[0]|upper }}</div>{% endif %}
+          </div>
+          <div class="staff-body">
+            <div class="staff-name">{{ member.name }}</div>
+            <div class="staff-role">{{ member.get('role','Educator') }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-5 fade-up">
+      <a href="{{ url_for('public.about') }}#staff" class="btn-primary-school">Meet All Staff</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ══ TESTIMONIALS MAGAZINE ═════════════════════════════════════════════════ #}
+{% if testimonials %}
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Community Voices</span>
+      <h2 class="section-title">What Families Say</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="test-mag-wrap fade-up">
+      <div class="test-mag-panel" id="testPanel">
+        <div class="big-quote">"</div>
+        <div class="test-mag-content">
+          <div class="test-mag-stars" id="testStars"></div>
+          <div class="test-mag-text" id="testText"></div>
+          <div class="test-mag-author">
+            <div class="test-mag-avatar" id="testAvatar"></div>
+            <div>
+              <div class="test-mag-name" id="testName"></div>
+              <div class="test-mag-role" id="testRole"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="test-mag-list">
+        {% for t in testimonials %}
+        <div class="test-mini-card {% if loop.first %}active{% endif %}"
+             data-name="{{ t.get('name','') }}"
+             data-role="{{ t.get('role','Parent') }}"
+             data-text="{{ t.get('text', t.get('message','')) }}"
+             data-rating="{{ t.get('rating',5) }}"
+             data-photo="{{ person_photo(t) }}"
+             onclick="selectTest(this)">
+          <div class="test-mini-stars">{% for i in range(t.get('rating',5)) %}<i class="bi bi-star-fill"></i>{% endfor %}</div>
+          <div class="test-mini-text">"{{ (t.get('text', t.get('message','')))[:90] }}{% if (t.get('text','') or '') | length > 90 %}…{% endif %}"</div>
+          <div class="test-mini-name">{{ t.get('name','') }}</div>
+          <div class="test-mini-role">{{ t.get('role','Parent') }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ══ CAMPUS CTA ════════════════════════════════════════════════════════════ #}
+<section class="campus-cta">
+  <div class="campus-cta-bg">
+    <img src="{{ simg(settings,'hero_image_3','https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&q=80') }}" alt="MPSK Campus" loading="lazy">
+  </div>
+  <div class="container">
+    <div class="campus-cta-content fade-up">
+      <div class="hero-pill mb-4">
+        <i class="bi bi-calendar-check-fill me-2"></i>Enrolment Open — {{ settings.get('current_term','Term 2 2025') }}
+      </div>
+      <h2 class="section-title section-title-light mb-3" style="font-size:clamp(2rem,3.8vw,3.2rem)">Give Your Child the Kabarak Advantage</h2>
+      <p style="color:rgba(255,255,255,.8);font-size:1.05rem;line-height:1.75;margin-bottom:36px;max-width:480px">
+        Join hundreds of families who trust MPSK to lay a strong academic and moral foundation. Limited places available each term.
+      </p>
+      <div class="d-flex gap-3 flex-wrap">
+        <a href="{{ url_for('public.admissions') }}" class="btn-hero-primary"><i class="bi bi-person-plus-fill me-2"></i>Start Application</a>
+        <a href="{{ url_for('public.contact') }}" class="btn-hero-outline"><i class="bi bi-telephone me-2"></i>Book a School Tour</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ══ NEWSLETTER ════════════════════════════════════════════════════════════ #}
+<section class="py-5" style="background:linear-gradient(135deg,var(--maroon-deep),var(--green-deep));position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,148,58,.16),transparent 60%)"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-5 fade-up">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <i class="bi bi-mailbox2-flag" style="font-size:2.2rem;color:var(--gold-bright)"></i>
+          <div>
+            <h3 style="font-family:var(--font-serif);font-size:1.6rem;color:var(--white);margin:0">Stay Connected</h3>
+            <p style="color:rgba(255,255,255,.6);margin:0;font-size:14px">{{ settings.get('newsletter_intro','Get school updates delivered to your inbox') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7 fade-up" data-delay="100">
+        <div class="d-flex gap-2 flex-wrap">
+          <input type="email" id="nlEmail" placeholder="Your email address" class="form-control flex-grow-1"
+            style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:#fff;border-radius:10px;padding:12px 16px;font-size:14px;min-width:240px" required>
+          <button onclick="nlSubscribe()" id="nlBtn"
+            style="background:linear-gradient(135deg,var(--gold),var(--gold-bright));color:var(--maroon-deep);border:none;border-radius:10px;padding:12px 24px;font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;transition:all .2s;box-shadow:0 3px 14px rgba(201,148,58,.35)">
+            Subscribe <i class="bi bi-send-fill ms-1"></i>
+          </button>
+        </div>
+        <p id="nlMsg" class="mt-2 mb-0" style="font-size:13px;display:none"></p>
+        <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:8px"><i class="bi bi-shield-check me-1" style="color:var(--gold-bright)"></i>No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# Lightbox #}
+<div id="lightbox" class="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
+  <button class="lightbox-nav prev" onclick="lightboxNav(-1)"><i class="bi bi-chevron-left"></i></button>
+  <img class="lightbox-img" src="" alt="">
+  <button class="lightbox-nav next" onclick="lightboxNav(1)"><i class="bi bi-chevron-right"></i></button>
+  <div class="lightbox-caption"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectTest(el) {
+  document.querySelectorAll('.test-mini-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const name = el.dataset.name, role = el.dataset.role,
+        text = el.dataset.text, rating = parseInt(el.dataset.rating)||5,
+        photo = el.dataset.photo;
+  document.getElementById('testStars').innerHTML = Array(rating).fill('<i class="bi bi-star-fill"></i>').join('');
+  document.getElementById('testText').textContent = '\u201C' + text + '\u201D';
+  document.getElementById('testName').textContent = name;
+  document.getElementById('testRole').textContent = role;
+  const av = document.getElementById('testAvatar');
+  av.innerHTML = photo ? `<img src="${photo}" alt="${name}">` : name.charAt(0).toUpperCase();
+  const c = document.querySelector('.test-mag-content');
+  c.style.opacity='0'; c.style.transform='translateY(12px)';
+  setTimeout(()=>{ c.style.transition='opacity .35s,transform .35s'; c.style.opacity='1'; c.style.transform='translateY(0)'; }, 80);
+}
+const firstCard = document.querySelector('.test-mini-card');
+if (firstCard) selectTest(firstCard);
+
+async function nlSubscribe() {
+  const btn = document.getElementById('nlBtn'), msgEl = document.getElementById('nlMsg');
+  const email = document.getElementById('nlEmail').value;
+  if (!email) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" style="width:14px;height:14px;border-width:2px"></span>Subscribing…';
+  try {
+    const res = await fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const d = await res.json();
+    msgEl.style.display='block'; msgEl.style.color=d.success?'var(--gold-bright)':'#f87171'; msgEl.textContent=d.message;
+    if (d.success) document.getElementById('nlEmail').value='';
+  } catch { msgEl.style.display='block'; msgEl.style.color='#f87171'; msgEl.textContent='Something went wrong.'; }
+  btn.disabled=false; btn.innerHTML='Subscribe <i class="bi bi-send-fill ms-1"></i>';
+}
+
+document.querySelectorAll('.gi[data-lightbox]').forEach(el => {
+  el.addEventListener('click', () => openLightbox(el.dataset.lightbox, el.dataset.caption));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "public/base.html" %}
+{% block title %}Gallery — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider:'›'">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
+        <li class="breadcrumb-item active">Gallery</li>
+      </ol>
+    </nav>
+    <h1 class="page-hero-title">Photo Gallery</h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px">Life at MPSK — in pictures.</p>
+  </div>
+</section>
+<section class="section-padding">
+  <div class="container">
+    <div class="d-flex align-items-center gap-2 flex-wrap mb-5 fade-up">
+      <a href="{{ url_for('public.gallery') }}" class="gallery-filter-btn {% if category == 'all' %}active{% endif %}">All Photos</a>
+      {% for cat in categories %}
+      <a href="{{ url_for('public.gallery', category=cat) }}" class="gallery-filter-btn {% if category == cat %}active{% endif %}">{{ cat|capitalize }}</a>
+      {% endfor %}
+    </div>
+    {% if gallery %}
+    <div class="row g-3">
+      {% for item in gallery %}
+      <div class="col-sm-6 col-md-4 col-lg-3 fade-up" data-delay="{{ loop.index0 % 4 * 80 }}">
+        <div class="gallery-item">
+          {% set gsrc = item.get('image_url') or (url_for('static', filename='uploads/' + item.image) if item.get('image') else '') %}{% if gsrc %}<img src="{{ gsrc }}" alt="{{ item.title }}" loading="lazy">{% endif %}
+          <div class="gallery-overlay">
+            <div class="gallery-overlay-text">{{ item.title }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-images" style="font-size:4rem;color:var(--maroon-light)"></i>
+      <p style="color:var(--text-muted);margin-top:16px">No photos yet. Check back soon!</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

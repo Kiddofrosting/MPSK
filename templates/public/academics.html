@@ -1,0 +1,189 @@
+{% extends "public/base.html" %}
+{% block title %}Academics — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block meta_desc %}Explore MPSK's CBC curriculum, learning strands, academic achievements, and our approach to holistic education.{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider:'›'">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
+        <li class="breadcrumb-item active">Academics</li>
+      </ol>
+    </nav>
+    <h1 class="page-hero-title">Our Academic Programme</h1>
+    <p style="color:rgba(255,255,255,.75);max-width:540px;margin-top:12px;font-size:1.05rem">Delivering the Competency-Based Curriculum through the lens of Christian values and 21st-century pedagogy.</p>
+  </div>
+</section>
+
+{# CBC OVERVIEW #}
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 fade-up">
+        <span class="section-tag">Curriculum</span>
+        <h2 class="section-title">Competency-Based Curriculum (CBC)</h2>
+        <div class="section-divider left"></div>
+        <p style="color:var(--text-mid);line-height:1.8">The CBC, introduced by Kenya's Ministry of Education, moves beyond rote memorisation to develop seven core competencies in every learner: Communication &amp; Collaboration, Critical Thinking &amp; Problem-Solving, Creativity &amp; Imagination, Digital Literacy, Learning to Learn, Self-Efficacy, and Citizenship.</p>
+        <p style="color:var(--text-mid);line-height:1.8;margin-top:14px">At MPSK, we deliver the CBC with experienced teachers, rich learning materials, and pastoral support — grounded in the faith values of our Kabarak University parent institution.</p>
+        <div class="d-flex gap-3 mt-4 flex-wrap">
+          {% for label, val in [('Grades Offered','PP1 – Grade 9'),('Class Size','Max 35 pupils'),('Language','English & Kiswahili')] %}
+          <div style="background:var(--maroon-pale);border:1px solid var(--border);border-radius:10px;padding:14px 20px">
+            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">{{ label }}</div>
+            <div style="font-family:var(--font-serif);font-size:1.1rem;font-weight:700;color:var(--maroon-deep);margin-top:4px">{{ val }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-lg-6 fade-up" data-delay="200">
+        <div class="row g-3">
+          {% for icon, comp in [
+            ('bi-chat-dots','Communication & Collaboration'),
+            ('bi-cpu','Critical Thinking'),
+            ('bi-palette','Creativity & Imagination'),
+            ('bi-laptop','Digital Literacy'),
+            ('bi-arrow-repeat','Learning to Learn'),
+            ('bi-globe','Citizenship'),
+            ('bi-person-check','Self-Efficacy'),
+          ] %}
+          <div class="col-6">
+            <div style="display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--border-light);border-radius:10px;padding:12px 14px">
+              <div style="width:36px;height:36px;background:var(--maroon-light);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--maroon);font-size:18px;flex-shrink:0"><i class="bi {{ icon }}"></i></div>
+              <span style="font-size:12.5px;font-weight:600;color:var(--text-dark)">{{ comp }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# CBC STRANDS #}
+{% if strands %}
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Learning Areas</span>
+      <h2 class="section-title">CBC Learning Strands</h2>
+      <div class="section-divider"></div>
+      <p class="section-desc mx-auto">Each strand is carefully facilitated to develop knowledge, skills, values, and competencies relevant to real life.</p>
+    </div>
+    <div class="row g-4">
+      {% set strand_colors = ['#6B1E2E','#1A5E38','#8C2A3D','#2A7A4A','#C9943A','#4A1020','#0D3B24','#D4A843'] %}
+      {% for strand in strands %}
+      <div class="col-sm-6 col-lg-4 fade-up" data-delay="{{ loop.index0 % 3 * 100 }}">
+        <div class="cbc-strand-card">
+          <div class="cbc-strand-icon" style="background:{{ strand_colors[loop.index0 % strand_colors|length] }}">
+            <i class="bi {{ strand.get('icon','bi-journal-bookmark') }}"></i>
+          </div>
+          <div class="cbc-strand-name">{{ strand.name }}</div>
+          {% if strand.get('grades') %}<span class="cbc-strand-grades">{{ strand.grades }}</span>{% endif %}
+          {% if strand.get('description') %}<p style="font-size:13px;color:var(--text-muted);margin-top:12px">{{ strand.description }}</p>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% else %}
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Learning Areas</span>
+      <h2 class="section-title">CBC Learning Strands</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      {% for icon, name, grades, desc in [
+        ('bi-calculator','Mathematics','PP1–Grade 9','Number sense, algebra, geometry, statistics and financial literacy through practical tasks.'),
+        ('bi-translate','Languages','PP1–Grade 9','English, Kiswahili, and Kenya Sign Language — reading, writing, speaking, and listening.'),
+        ('bi-flask','Integrated Science','Grades 1–9','Biology, chemistry, physics, and agriculture explored through experiments and fieldwork.'),
+        ('bi-globe2','Social Studies','Grades 1–6','Civics, geography, history, and environmental education to develop responsible citizens.'),
+        ('bi-music-note-beamed','Creative Arts','PP1–Grade 9','Visual arts, music, movement, and drama to nurture imagination and cultural appreciation.'),
+        ('bi-laptop','ICT','Grades 1–9','Digital literacy, coding foundations, and responsible internet use for the modern world.'),
+        ('bi-heart-pulse','Health & PE','PP1–Grade 9','Physical fitness, nutrition, mental wellbeing, and life skills for a healthy lifestyle.'),
+        ('bi-book-open','Religious Education','PP1–Grade 9','Christian Religious Education grounding learners in biblical values and moral reasoning.'),
+      ] %}
+      <div class="col-sm-6 col-lg-3 fade-up" data-delay="{{ loop.index0 % 4 * 80 }}">
+        <div class="cbc-strand-card">
+          <div class="cbc-strand-icon" style="background:{{ ['#6B1E2E','#1A5E38','#8C2A3D','#2A7A4A','#C9943A','#4A1020','#0D3B24','#D4A843'][loop.index0] }}"><i class="bi {{ icon }}"></i></div>
+          <div class="cbc-strand-name">{{ name }}</div>
+          <span class="cbc-strand-grades">{{ grades }}</span>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:12px">{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ACHIEVEMENTS #}
+{% if achievements %}
+<section class="section-padding bg-maroon-pale">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Track Record</span>
+      <h2 class="section-title">Academic Achievements</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      {% for a in achievements %}
+      <div class="col-sm-6 col-lg-3 fade-up" data-delay="{{ loop.index0 % 4 * 100 }}">
+        <div class="achievement-card h-100">
+          <div class="achievement-icon"><i class="bi bi-trophy-fill"></i></div>
+          {% if a.get('year') %}<div class="achievement-year">{{ a.year }}</div>{% endif %}
+          <div class="achievement-title">{{ a.title }}</div>
+          <div class="achievement-desc">{{ a.get('description','') }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# CO-CURRICULARS #}
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Beyond the Classroom</span>
+      <h2 class="section-title">Co-Curricular Activities</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      {% for icon, title, desc in [
+        ('bi-trophy','Sports & Athletics','Football, netball, volleyball, athletics, swimming — developing teamwork and physical fitness.'),
+        ('bi-music-note-list','Music & Drama','School choir, drama club, and instrumental music that bring out every child\'s creative voice.'),
+        ('bi-cpu','Science & Tech Club','Robotics, coding challenges, and science fairs that stretch the minds of budding innovators.'),
+        ('bi-book-half','Debate & Oratory','Equipping learners with confident public speaking, critical analysis, and persuasive skills.'),
+        ('bi-brush','Visual Arts','Painting, sculpture, and design — developing aesthetic sensibility and manual dexterity.'),
+        ('bi-heart','Community Service','CRE-based outreach projects that build empathy, leadership, and civic responsibility.'),
+      ] %}
+      <div class="col-md-6 col-lg-4 fade-up" data-delay="{{ loop.index0 % 3 * 100 }}">
+        <div style="display:flex;gap:16px;padding:20px;background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius);transition:all .25s" onmouseover="this.style.borderColor='var(--maroon)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(0,0,0,.06)';this.style.transform='none'">
+          <div style="width:48px;height:48px;background:var(--maroon-light);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--maroon);font-size:22px;flex-shrink:0"><i class="bi {{ icon }}"></i></div>
+          <div>
+            <div style="font-family:var(--font-serif);font-weight:700;color:var(--maroon-deep);margin-bottom:4px">{{ title }}</div>
+            <div style="font-size:13px;color:var(--text-muted)">{{ desc }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section-padding" style="background:linear-gradient(145deg,var(--maroon-deep),var(--maroon) 60%,var(--green-deep))">
+  <div class="container text-center">
+    <div class="col-lg-6 mx-auto fade-up">
+      <h2 class="section-title section-title-light mb-3">Enrol Your Child Today</h2>
+      <p style="color:rgba(255,255,255,.8);margin-bottom:28px">Spaces are limited each term. Secure your child's place at MPSK.</p>
+      <a href="{{ url_for('public.admissions') }}" class="btn-hero-primary"><i class="bi bi-person-plus-fill me-2"></i>View Admissions</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "public/base.html" %}
+{% block title %}{{ article.title }} — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider:'›'">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('public.news') }}">News</a></li>
+        <li class="breadcrumb-item active">Article</li>
+      </ol>
+    </nav>
+    <span class="news-cat-badge" style="background:rgba(255,255,255,.15);color:var(--gold-bright);border-color:rgba(255,255,255,.2)">{{ article.get('category','News') }}</span>
+    <h1 class="page-hero-title mt-2">{{ article.title }}</h1>
+    <div style="color:rgba(255,255,255,.65);font-size:13px;margin-top:12px;display:flex;gap:20px;flex-wrap:wrap">
+      <span><i class="bi bi-calendar3 me-1"></i>{{ article.date.strftime('%d %B %Y') if article.date else '' }}</span>
+      <span><i class="bi bi-person me-1"></i>{{ article.get('author','School Administration') }}</span>
+      <span><i class="bi bi-eye me-1"></i>{{ article.get('views',0) }} views</span>
+    </div>
+  </div>
+</section>
+<section class="section-padding">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        {% if article.get('image') %}
+        {% set asrc = article.get('image_url') or (url_for('static', filename='uploads/' + article.image) if article.get('image') else '') %}{% if asrc %}<img src="{{ asrc }}" alt="{{ article.title }}" style="width:100%;border-radius:var(--radius-lg);margin-bottom:32px;max-height:420px;object-fit:cover">{% endif %}
+        {% endif %}
+        <div style="font-size:15.5px;color:var(--text-mid);line-height:1.85">{{ article.get('content','') | safe }}</div>
+        <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border-light)">
+          <a href="{{ url_for('public.news') }}" style="color:var(--maroon);font-weight:600"><i class="bi bi-arrow-left me-2"></i>Back to all news</a>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        {% if related %}
+        <div style="background:var(--cream);border-radius:var(--radius-lg);padding:24px">
+          <h5 style="font-family:var(--font-serif);color:var(--maroon-deep);margin-bottom:20px">Related Articles</h5>
+          {% for r in related %}
+          <a href="{{ url_for('public.news_detail', slug=r.slug) }}" style="display:block;padding:14px 0;border-bottom:1px solid var(--border-light);text-decoration:none" class="hover-maroon">
+            <div style="font-size:11px;color:var(--maroon);font-weight:700;margin-bottom:5px">{{ r.get('category','News') }}</div>
+            <div style="font-weight:600;color:var(--text-dark);font-size:14px;line-height:1.4">{{ r.title }}</div>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

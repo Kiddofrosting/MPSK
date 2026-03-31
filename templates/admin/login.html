@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — MPSK</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="login-page-bg">
+
+<div style="position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(255,255,255,.02) 40px,rgba(255,255,255,.02) 80px);pointer-events:none"></div>
+
+<div class="login-card position-relative">
+  <div class="text-center mb-5">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#8C2A3D,#4A1020);border:2.5px solid #C9943A;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 20px rgba(107,30,46,.3)">
+      <span style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:#C9943A">M</span>
+    </div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:800;color:#4A1020;margin-bottom:4px">MPSK Admin</h2>
+    <p style="color:#7A6A6A;font-size:13.5px">Sign in to manage your school website</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for cat, msg in messages %}
+  <div class="alert alert-{{ 'success' if cat == 'success' else 'danger' }} mb-4" role="alert">{{ msg }}</div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('admin.login') }}">
+    <div class="mb-3">
+      <label style="font-size:12.5px;font-weight:700;color:#4A3A3A;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px">Username</label>
+      <div style="position:relative">
+        <i class="bi bi-person-fill" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7A6A6A;font-size:16px"></i>
+        <input type="text" name="username" class="form-control" placeholder="Enter username" required autocomplete="username" style="padding-left:38px;border:1.5px solid rgba(107,30,46,.15);border-radius:10px;padding-top:11px;padding-bottom:11px">
+      </div>
+    </div>
+    <div class="mb-4">
+      <label style="font-size:12.5px;font-weight:700;color:#4A3A3A;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px">Password</label>
+      <div style="position:relative">
+        <i class="bi bi-lock-fill" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7A6A6A;font-size:16px"></i>
+        <input type="password" name="password" id="pwdField" class="form-control" placeholder="Enter password" required autocomplete="current-password" style="padding-left:38px;padding-right:44px;border:1.5px solid rgba(107,30,46,.15);border-radius:10px;padding-top:11px;padding-bottom:11px">
+        <button type="button" onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#7A6A6A;cursor:pointer;font-size:16px" id="pwdToggle">
+          <i class="bi bi-eye" id="pwdToggleIcon"></i>
+        </button>
+      </div>
+    </div>
+    <button type="submit" style="width:100%;background:linear-gradient(135deg,#6B1E2E,#4A1020);color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;transition:all .22s;box-shadow:0 4px 16px rgba(107,30,46,.3)">
+      <i class="bi bi-shield-lock-fill me-2"></i>Sign In
+    </button>
+  </form>
+
+  <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(107,30,46,.08);text-align:center">
+    <a href="{{ url_for('public.index') }}" style="color:#6B1E2E;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px">
+      <i class="bi bi-arrow-left"></i> Back to School Website
+    </a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function togglePwd() {
+  const f = document.getElementById('pwdField');
+  const icon = document.getElementById('pwdToggleIcon');
+  const show = f.type === 'password';
+  f.type = show ? 'text' : 'password';
+  icon.className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+}
+</script>
+</body>
+</html>

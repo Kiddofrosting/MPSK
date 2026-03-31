@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+{% block title %}Staff{% endblock %}
+{% block page_title %}Staff Members{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Manage teaching and administrative staff profiles.</p>
+  <button class="btn-maroon" onclick="openStaffModal()"><i class="bi bi-plus-lg me-2"></i>Add Staff</button>
+</div>
+<div class="card-admin">
+  {% if staff is defined and staff %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Name</th><th>Role</th><th>Qualifications</th><th>Featured</th><th>Order</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for m in staff %}
+      <tr id="staff-{{ m._id }}">
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            {% if m.get('photo') %}
+            <img src="{{ url_for('static', filename='uploads/' + m.photo) }}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--maroon-light)">
+            {% elif m.get('photo_url') %}
+            <img src="{{ m.photo_url }}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--maroon-light)">
+            {% else %}
+            <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--maroon),var(--maroon-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:700;font-size:14px">{{ m.name[0]|upper }}</div>
+            {% endif %}
+            <span style="font-weight:600;color:var(--maroon-deep)">{{ m.name }}</span>
+          </div>
+        </td>
+        <td style="font-size:13.5px;color:var(--text-mid)">{{ m.get('role','Educator') }}</td>
+        <td style="font-size:13px;color:var(--text-muted)">{{ m.get('qualifications','—') }}</td>
+        <td>{% if m.get('featured') %}<span class="badge-status badge-published">Yes</span>{% else %}<span style="font-size:12px;color:#999">No</span>{% endif %}</td>
+        <td style="font-size:13px;color:#999">{{ m.get('order',99) }}</td>
+        <td style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-edit edit-staff-btn" title="Edit"
+            data-id="{{ m._id }}"
+            data-name="{{ m.name }}"
+            data-role="{{ m.get('role','') }}"
+            data-qualifications="{{ m.get('qualifications','') }}"
+            data-bio="{{ m.get('bio','') }}"
+            data-order="{{ m.get('order',99) }}"
+            data-featured="{{ 'true' if m.get('featured') else 'false' }}"
+            data-photo-url="{{ m.get('photo_url','') }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_staff', id=m._id) }}','staff-{{ m._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-people"></i><h6>No staff profiles yet</h6><p>Add staff members to showcase them on the website.</p></div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="staffModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staffModalTitle">Add Staff Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_staff') }}" enctype="multipart/form-data">
+          <input type="hidden" name="staff_id" id="staff_id">
+          <div class="mb-3"><label class="form-label">Full Name *</label><input type="text" name="name" id="st_name" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Role / Title *</label><input type="text" name="role" id="st_role" class="form-control" placeholder="e.g. Class Teacher — Grade 4" required></div>
+          <div class="mb-3"><label class="form-label">Qualifications</label><input type="text" name="qualifications" id="st_qual" class="form-control" placeholder="e.g. B.Ed (Arts), P1"></div>
+          <div class="mb-3"><label class="form-label">Bio (optional)</label><textarea name="bio" id="st_bio" class="form-control" rows="2" placeholder="Brief introduction…"></textarea></div>
+          <div class="mb-3">
+            <label class="form-label">Photo</label>
+            <div style="background:var(--bg-soft,#f8f5f5);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
+              <div style="font-size:12px;font-weight:700;color:var(--maroon-deep);margin-bottom:8px"><i class="bi bi-upload me-1"></i>Upload File</div>
+              <input type="file" name="photo" id="st_photo_file" class="form-control form-control-sm" accept="image/*">
+              <div style="text-align:center;font-size:11px;color:#bbb;margin:8px 0;font-weight:600">— OR —</div>
+              <div style="font-size:12px;font-weight:700;color:var(--maroon-deep);margin-bottom:6px"><i class="bi bi-link-45deg me-1"></i>Image URL</div>
+              <input type="url" name="photo_url" id="st_photo_url" class="form-control form-control-sm" placeholder="https://example.com/photo.jpg">
+              <div style="font-size:11px;color:#999;margin-top:4px">Upload a file OR paste a URL — file takes priority.</div>
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6"><label class="form-label">Display Order</label><input type="number" name="order" id="st_order" class="form-control" value="99" min="1"></div>
+            <div class="col-6"><label class="form-label">Featured on Homepage?</label><select name="featured" id="st_featured" class="form-select"><option value="true">Yes</option><option value="false">No</option></select></div>
+          </div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px"><i class="bi bi-person-plus me-2"></i>Save Staff Member</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openStaffModal() {
+  document.getElementById('staffModalTitle').textContent = 'Add Staff Member';
+  document.getElementById('staff_id').value = '';
+  document.getElementById('photoHint').textContent = '(JPG, PNG, max 5MB)';
+  ['st_name','st_role','st_qual','st_bio'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('st_order').value = '99';
+  document.getElementById('st_featured').value = 'false';
+  new bootstrap.Modal(document.getElementById('staffModal')).show();
+}
+document.querySelectorAll('.edit-staff-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('staffModalTitle').textContent = 'Edit Staff Member';
+    document.getElementById('staff_id').value = d.id;
+    document.getElementById('st_name').value = d.name;
+    document.getElementById('st_role').value = d.role;
+    document.getElementById('st_qual').value = d.qualifications;
+    document.getElementById('st_bio').value = d.bio;
+    document.getElementById('st_order').value = d.order;
+    document.getElementById('st_featured').value = d.featured;
+    document.getElementById('st_photo_url').value = d.photoUrl || '';
+    document.getElementById('st_photo_file').value = '';
+    new bootstrap.Modal(document.getElementById('staffModal')).show();
+  });
+});
+</script>
+{% endblock %}

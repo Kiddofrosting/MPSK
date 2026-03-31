@@ -1,0 +1,96 @@
+{% extends "admin/base.html" %}
+{% block title %}FAQs{% endblock %}
+{% block page_title %}FAQs{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Add frequently asked questions shown on the FAQ page.</p>
+  <button class="btn-maroon" onclick="openFaqModal()"><i class="bi bi-plus-lg me-2"></i>Add FAQ</button>
+</div>
+<div class="card-admin">
+  {% if faqs is defined and faqs %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Question</th><th>Category</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for f in faqs %}
+      <tr id="faq-{{ f._id }}">
+        <td style="max-width:320px"><div style="font-weight:600;color:var(--maroon-deep)">{{ f.question }}</div><div style="font-size:12px;color:#999;margin-top:2px">{{ f.answer[:70] }}…</div></td>
+        <td><span style="background:var(--maroon-light);color:var(--maroon);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">{{ f.get('category','General') }}</span></td>
+        <td style="color:#999;font-size:13px">{{ f.get('order',1) }}</td>
+        <td>{% if f.get('published') %}<span class="badge-status badge-published">Live</span>{% else %}<span class="badge-status badge-pending">Hidden</span>{% endif %}</td>
+        <td style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-edit edit-faq-btn" title="Edit"
+            data-id="{{ f._id }}"
+            data-question="{{ f.question }}"
+            data-answer="{{ f.answer }}"
+            data-category="{{ f.get('category','General') }}"
+            data-order="{{ f.get('order',1) }}"
+            data-published="{{ 'true' if f.get('published') else 'false' }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_faq', id=f._id) }}','faq-{{ f._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-question-circle"></i><h6>No FAQs yet</h6><p>Add common questions to help parents find answers quickly.</p></div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="faqModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="faqModalTitle">Add FAQ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_faq') }}">
+          <input type="hidden" name="faq_id" id="faq_id">
+          <div class="mb-3"><label class="form-label">Question *</label><input type="text" name="question" id="faq_q" class="form-control" required placeholder="Enter the question"></div>
+          <div class="mb-3"><label class="form-label">Answer *</label><textarea name="answer" id="faq_a" class="form-control" rows="5" required placeholder="Full answer…"></textarea></div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Category</label>
+              <select name="category" id="faq_cat" class="form-select">{% for c in ['Admissions','Fees','Curriculum','School Life','Transport','General'] %}<option>{{ c }}</option>{% endfor %}</select>
+            </div>
+            <div class="col-md-4"><label class="form-label">Display Order</label><input type="number" name="order" id="faq_order" class="form-control" value="99" min="1"></div>
+            <div class="col-md-4"><label class="form-label">Publish?</label>
+              <select name="published" id="faq_pub" class="form-select"><option value="true">Yes — Live</option><option value="false">No — Draft</option></select>
+            </div>
+          </div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px">Save FAQ</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openFaqModal() {
+  document.getElementById('faqModalTitle').textContent = 'Add FAQ';
+  document.getElementById('faq_id').value = '';
+  ['faq_q','faq_a'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('faq_cat').value = 'General';
+  document.getElementById('faq_order').value = '99';
+  document.getElementById('faq_pub').value = 'true';
+  new bootstrap.Modal(document.getElementById('faqModal')).show();
+}
+document.querySelectorAll('.edit-faq-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('faqModalTitle').textContent = 'Edit FAQ';
+    document.getElementById('faq_id').value = d.id;
+    document.getElementById('faq_q').value = d.question;
+    document.getElementById('faq_a').value = d.answer;
+    document.getElementById('faq_cat').value = d.category;
+    document.getElementById('faq_order').value = d.order;
+    document.getElementById('faq_pub').value = d.published;
+    new bootstrap.Modal(document.getElementById('faqModal')).show();
+  });
+});
+</script>
+{% endblock %}

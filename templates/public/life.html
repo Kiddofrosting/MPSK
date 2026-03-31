@@ -1,0 +1,186 @@
+{% extends "public/base.html" %}
+{% block title %}Life at MPSK — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block meta_desc %}Discover the vibrant school life at MPSK — sports, arts, clubs, boarding, and a safe nurturing campus community.{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider:'›'">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
+        <li class="breadcrumb-item active">School Life</li>
+      </ol>
+    </nav>
+    <h1 class="page-hero-title">Life at MPSK</h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px;font-size:1.05rem">More than academics — a thriving community where children grow, play, create, and belong.</p>
+  </div>
+</section>
+
+{# Life pillars #}
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Campus Life</span>
+      <h2 class="section-title">A Day at MPSK</h2>
+      <div class="section-divider"></div>
+      <p class="section-desc mx-auto">Every day at MPSK is designed to challenge, inspire, and delight. Here's what a typical school day looks like.</p>
+    </div>
+    <div class="row g-4">
+      {% for time, title, desc in [
+        ('6:30 AM','Morning Assembly','The school day begins with devotion, national anthem, and announcements — grounding learners in faith and community.'),
+        ('7:00 AM','Lessons Begin','Structured CBC learning in engaging, well-resourced classrooms with experienced teachers.'),
+        ('10:30 AM','Break Time','Supervised play, snacks, and social time in our safe, spacious school grounds.'),
+        ('1:00 PM','Lunch','Nutritious meals prepared in our school kitchen, followed by rest or quiet reading time.'),
+        ('3:30 PM','Co-Curricular','Clubs, sports, music, and enrichment activities that develop talents beyond the classroom.'),
+        ('5:00 PM','Home Time','Safe dismissal, supervised boarding routines, and transport to various routes.'),
+      ] %}
+      <div class="col-md-6 col-lg-4 fade-up" data-delay="{{ loop.index0 % 3 * 100 }}">
+        <div style="display:flex;gap:16px;background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius);padding:20px;height:100%;transition:all .25s" onmouseover="this.style.borderColor='var(--maroon)';this.style.boxShadow='var(--shadow-sm)'" onmouseout="this.style.borderColor='rgba(0,0,0,.06)';this.style.boxShadow='none'">
+          <div style="flex-shrink:0;text-align:center">
+            <div style="background:var(--maroon);color:var(--gold-bright);border-radius:10px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.3px;white-space:nowrap">{{ time }}</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-serif);font-weight:700;color:var(--maroon-deep);margin-bottom:6px">{{ title }}</div>
+            <div style="font-size:13.5px;color:var(--text-muted)">{{ desc }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# GALLERY #}
+<section class="section-padding">
+  <div class="container">
+    <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+      <div class="fade-up">
+        <span class="section-tag">Photography</span>
+        <h2 class="section-title">Life in Pictures</h2>
+        <div class="section-divider left"></div>
+      </div>
+      <div class="d-flex gap-2 flex-wrap fade-up" data-delay="100">
+        {% for cat in ['all','Academic','Sports','Events','Arts','Community'] %}
+        <button onclick="filterGallery('{{ cat }}')" class="gallery-filter-btn {% if cat == 'all' %}active{% endif %}" id="gbtn-{{ cat }}">{{ 'All' if cat == 'all' else cat }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if items %}
+    <div class="row g-3" id="galleryGrid">
+      {% for item in items %}
+      <div class="col-6 col-md-4 col-lg-3 gallery-grid-item fade-up" data-cat="{{ item.get('category','') }}" data-delay="{{ loop.index0 % 4 * 80 }}">
+        <div class="gallery-item">
+          {% if item.get('image') %}
+          {% set lsrc = item.get('image_url') or (url_for('static', filename='uploads/' + item.image) if item.get('image') else '') %}{% if lsrc %}<img src="{{ lsrc }}" alt="{{ item.get('caption','') }}" loading="lazy">{% endif %}
+          {% else %}
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--maroon-light),var(--maroon-pale));display:flex;align-items:center;justify-content:center">
+            <i class="bi bi-image" style="font-size:3rem;color:var(--maroon);opacity:.3"></i>
+          </div>
+          {% endif %}
+          <div class="gallery-overlay">
+            <span class="gallery-overlay-text">{{ item.get('caption','') }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 fade-up">
+      <i class="bi bi-images" style="font-size:4rem;color:var(--maroon-light)"></i>
+      <p style="color:var(--text-muted);margin-top:14px">Photos will be added here by our team.</p>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-5 fade-up">
+      <a href="{{ url_for('public.gallery') }}" class="btn-primary-school">View Full Gallery <i class="bi bi-images ms-2"></i></a>
+    </div>
+  </div>
+</section>
+
+{# SPORTS & CLUBS #}
+<section class="section-padding bg-maroon-pale">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Activities</span>
+      <h2 class="section-title">Sports &amp; Clubs</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      {% for icon, name, desc in [
+        ('bi-dribbble','Football','Boys & girls competitive teams representing MPSK at zone and national level.'),
+        ('bi-people','Netball','One of our strongest teams, with a proud history in regional competitions.'),
+        ('bi-music-note-list','School Choir','Award-winning voices trained by dedicated music teachers every week.'),
+        ('bi-cpu','Tech & Coding Club','Robotics, programming, and digital innovation for future tech leaders.'),
+        ('bi-book-half','Debate Club','Confident, articulate communicators shaped through weekly debate sessions.'),
+        ('bi-brush','Art & Craft','Creative expression through painting, sculpture, and visual design.'),
+        ('bi-globe2','Environmental Club','Green schools initiatives, tree planting, and sustainability awareness.'),
+        ('bi-heart','Christian Union','Weekly fellowship, worship, and Bible study guided by our chaplain.'),
+      ] %}
+      <div class="col-sm-6 col-lg-3 fade-up" data-delay="{{ loop.index0 % 4 * 80 }}">
+        <div style="background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 18px;text-align:center;height:100%;transition:all .28s" onmouseover="this.style.borderColor='var(--maroon)';this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.borderColor='rgba(0,0,0,.06)';this.style.transform='none';this.style.boxShadow='none'">
+          <div style="width:52px;height:52px;background:var(--maroon-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;color:var(--maroon)"><i class="bi {{ icon }}"></i></div>
+          <div style="font-family:var(--font-serif);font-weight:700;color:var(--maroon-deep);margin-bottom:6px">{{ name }}</div>
+          <div style="font-size:13px;color:var(--text-muted)">{{ desc }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# TRANSPORT #}
+<section class="section-padding">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-5 fade-up">
+        <span class="section-tag">Getting Here</span>
+        <h2 class="section-title">School Transport</h2>
+        <div class="section-divider left"></div>
+        <p style="color:var(--text-muted);line-height:1.75">MPSK operates a supervised school bus service covering major routes in and around Nakuru. All buses are tracked, supervised by trained attendants, and follow strict schedules.</p>
+        <div style="background:var(--maroon-pale);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-top:20px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--maroon);letter-spacing:.5px;margin-bottom:10px">Transport Enquiries</div>
+          <div style="font-weight:600;color:var(--text-dark)">{{ settings.get('phone','+254 729 223 370') }}</div>
+          <div style="font-size:13px;color:var(--text-muted)">Transport Office · Mon–Fri, 7:00 AM – 5:00 PM</div>
+        </div>
+      </div>
+      <div class="col-lg-7 fade-up" data-delay="200">
+        <div class="row g-3">
+          {% for route, stops in [
+            ('Route A – Nakuru Town', ['Westside Mall', 'Milimani Estate', 'Pipeline', 'Kabarak Gate']),
+            ('Route B – Bahati', ['Bahati Market', 'Free Area', 'Lanet', 'Kabarak Gate']),
+            ('Route C – Nakuru East', ['Bondeni', 'Section 58', 'Kiamunyi', 'Kabarak Gate']),
+            ('Route D – Njoro', ['Njoro Market', 'Egerton', 'Larmudiac', 'Kabarak Gate']),
+          ] %}
+          <div class="col-sm-6">
+            <div class="route-card h-100">
+              <h6>{{ route }}</h6>
+              {% for stop in stops %}
+              <div class="route-stop">
+                <div class="route-stop-dot"></div>
+                {{ stop }}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+function filterGallery(cat) {
+  document.querySelectorAll('.gallery-filter-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('gbtn-' + cat)?.classList.add('active');
+  document.querySelectorAll('.gallery-grid-item').forEach(item => {
+    const show = cat === 'all' || item.dataset.cat === cat;
+    item.style.display = show ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

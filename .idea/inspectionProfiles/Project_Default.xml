@@ -1,0 +1,27 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="bson" />
+          <option value="Flask" />
+          <option value="Werkzeug" />
+          <option value="Flask-Login" />
+          <option value="Flask-Bcrypt" />
+          <option value="Flask-CORS" />
+          <option value="Flask-Limiter" />
+          <option value="Flask-WTF" />
+          <option value="pymongo" />
+          <option value="python-dotenv" />
+          <option value="marshmallow" />
+          <option value="pytest" />
+          <option value="pytest-flask" />
+          <option value="black" />
+          <option value="flake8" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

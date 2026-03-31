@@ -1,0 +1,43 @@
+{# ─── Image resolver macro ─────────────────────────────────────────────────
+   Usage: {{ img(item, 'image', 'image_url', fallback_url) }}
+   Checks uploaded file first, then image_url, then fallback.
+─────────────────────────────────────────────────────────────────────────── #}
+{% macro img(obj, file_field='image', url_field='image_url', fallback='') %}
+  {%- if obj.get(file_field) -%}
+    {{ url_for('static', filename='uploads/' + obj[file_field]) }}
+  {%- elif obj.get(url_field) -%}
+    {{ obj[url_field] }}
+  {%- else -%}
+    {{ fallback }}
+  {%- endif -%}
+{% endmacro %}
+
+{% macro has_img(obj, file_field='image', url_field='image_url') %}
+  {%- if obj.get(file_field) or obj.get(url_field) -%}true{%- endif -%}
+{% endmacro %}
+
+{# ─── Settings image resolver ──────────────────────────────────────────────
+   Usage: {{ simg(settings, 'hero_image_1', fallback_url) }}
+   Handles both /static/uploads/ paths and external URLs stored in settings.
+─────────────────────────────────────────────────────────────────────────── #}
+{% macro simg(s, key, fallback='') %}
+  {%- set val = s.get(key, '') -%}
+  {%- if val and val.startswith('/static/uploads/') -%}
+    {{ val }}
+  {%- elif val -%}
+    {{ val }}
+  {%- else -%}
+    {{ fallback }}
+  {%- endif -%}
+{% endmacro %}
+
+{# ─── Staff / testimonial photo resolver ────────────────────────────────────
+   Usage: {{ person_photo(obj, fallback_initial) }}
+─────────────────────────────────────────────────────────────────────────── #}
+{% macro person_photo(obj, file_field='photo', url_field='photo_url') %}
+  {%- if obj.get(file_field) -%}
+    {{ url_for('static', filename='uploads/' + obj[file_field]) }}
+  {%- elif obj.get(url_field) -%}
+    {{ obj[url_field] }}
+  {%- else -%}{%- endif -%}
+{% endmacro %}

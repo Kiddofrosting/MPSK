@@ -1,0 +1,287 @@
+{% extends "public/base.html" %}
+{% from "public/macros.html" import img, has_img, simg, person_photo %}
+{% block title %}About Us — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block meta_desc %}Learn about Moi Primary & Junior School Kabarak — our history, vision, mission, head teacher, and our affiliation with Kabarak University.{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider:'›'">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
+        <li class="breadcrumb-item active">About</li>
+      </ol>
+    </nav>
+    <h1 class="page-hero-title">About MPSK</h1>
+    <p style="color:rgba(255,255,255,.75);max-width:560px;margin-top:12px;font-size:1.05rem">
+      {{ settings.get('motto','Excellence Through Faith') }} — rooted in Christian values, committed to every learner.
+    </p>
+  </div>
+</section>
+
+{# ── QUICK STATS ─────────────────────────────────────────────────────────── #}
+<section style="background:var(--maroon-deep);padding:36px 0">
+  <div class="container">
+    <div class="row g-3 text-center">
+      {% for num, label in [
+        (settings.get('stats_students','800+'), 'Students Enrolled'),
+        (settings.get('stats_teachers','45+'), 'Educators'),
+        (settings.get('stats_years','30+'), 'Years of Excellence'),
+        (settings.get('stats_pass_rate','100%'), 'CBC Pass Rate'),
+      ] %}
+      <div class="col-6 col-md-3">
+        <div class="stat-pill">
+          <div class="stat-pill-number fade-up">{{ num }}</div>
+          <div class="stat-pill-label">{{ label }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ── VISION & MISSION ────────────────────────────────────────────────────── #}
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5 fade-up">
+        <span class="section-tag">Our Identity</span>
+        <h2 class="section-title">Who We Are</h2>
+        <div class="section-divider left"></div>
+        <p style="color:var(--text-mid);line-height:1.82;font-size:15px">
+          Moi Primary &amp; Junior School Kabarak was established in {{ settings.get('founded','1991') }} on the Kabarak University campus in Nakuru County.
+          Over more than three decades, MPSK has grown into one of the region's most trusted primary institutions —
+          offering CBC education from PP1 to Grade 9 within a safe, faith-centred environment.
+        </p>
+        <p style="color:var(--text-mid);line-height:1.82;font-size:15px;margin-top:14px">
+          As an affiliate of Kabarak University, we are guided by the principle of <em>Education in Biblical Perspective</em> —
+          forming learners who are not only academically excellent but morally grounded, socially responsible, and purpose-driven.
+        </p>
+
+        <div class="row g-3 mt-4">
+          {% for icon, label, value in [
+            ('bi-geo-alt-fill','Location', settings.get('address','Kabarak, Nakuru County')),
+            ('bi-telephone-fill','Phone', settings.get('phone','+254 727 733 113')),
+            ('bi-envelope-fill','Email', settings.get('email','info@mpsk.ac.ke')),
+            ('bi-mortarboard-fill','Affiliation','Kabarak University'),
+          ] %}
+          <div class="col-12">
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="width:36px;height:36px;background:var(--maroon-light);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--maroon);flex-shrink:0">
+                <i class="bi {{ icon }}"></i>
+              </div>
+              <div>
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:700">{{ label }}</div>
+                <div style="font-size:14px;color:var(--text-dark);font-weight:600;margin-top:2px">{{ value }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-lg-7 fade-up" data-delay="200">
+        <div class="row g-4">
+          {% for icon, title, text in [
+            ('bi-eye-fill','Our Vision', settings.get('vision','To be an excellent centre of academic knowledge and spiritual growth in Kenya.')),
+            ('bi-bullseye','Our Mission', settings.get('mission','To provide quality, holistic education grounded in Christian values, nurturing every learner to achieve their full potential.')),
+            ('bi-shield-fill','Our Motto', settings.get('motto','Excellence Through Faith')),
+            ('bi-heart-fill','Our Values','Integrity · Diligence · Compassion · Faith · Service'),
+          ] %}
+          <div class="col-sm-6">
+            <div class="value-card h-100">
+              <div class="value-icon"><i class="bi {{ icon }}"></i></div>
+              <h5>{{ title }}</h5>
+              <p style="font-size:13.5px;color:var(--text-muted);line-height:1.65;margin:0">{{ text }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ── HEAD TEACHER ────────────────────────────────────────────────────────── #}
+<section class="section-padding" id="head-teacher">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-4 text-center fade-up">
+        {% set ht_photo = simg(settings, 'head_teacher_image', '') %}
+        {% if ht_photo %}
+        <div style="width:180px;height:180px;border-radius:50%;overflow:hidden;border:5px solid var(--gold);margin:0 auto;box-shadow:var(--shadow-lg)">
+          <img src="{{ ht_photo }}" alt="{{ settings.get('head_teacher','Head Teacher') }}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+        </div>
+        {% else %}
+        <div style="width:180px;height:180px;border-radius:50%;background:linear-gradient(145deg,var(--maroon),var(--maroon-deep));border:5px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:var(--shadow-lg)">
+          <span style="font-family:var(--font-serif);font-size:4rem;font-weight:800;color:var(--gold)">
+            {{ (settings.get('head_teacher','HT')[:1]) }}
+          </span>
+        </div>
+        {% endif %}
+        <h3 style="font-family:var(--font-serif);color:var(--maroon-deep);margin-top:20px">{{ settings.get('head_teacher','The Head Teacher') }}</h3>
+        <p style="color:var(--maroon);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Head Teacher, MPSK</p>
+      </div>
+      <div class="col-lg-8 fade-up" data-delay="200">
+        <span class="section-tag">Leadership</span>
+        <h2 class="section-title" style="font-size:2rem">Head Teacher's Message</h2>
+        <div class="section-divider left"></div>
+        <div style="position:relative;padding-left:28px;border-left:4px solid var(--gold)">
+          <i class="bi bi-quote" style="position:absolute;top:-8px;left:-8px;font-size:2.4rem;color:var(--gold);opacity:.4"></i>
+          <p style="font-family:var(--font-serif);font-size:1.05rem;color:var(--text-mid);line-height:1.85;font-style:italic">
+            {{ settings.get('head_teacher_message', 'Welcome to Moi Primary & Junior School Kabarak. Our institution stands on a foundation of academic excellence, Christian values, and holistic child development. We are committed to nurturing every learner under the Competency Based Curriculum to become a responsible, creative, and productive citizen. I warmly invite you to join our school family.') }}
+          </p>
+        </div>
+        <div style="margin-top:24px;display:flex;gap:12px">
+          <a href="{{ url_for('public.admissions') }}" class="btn-primary-school">
+            <i class="bi bi-person-plus me-2"></i>Enrol Your Child
+          </a>
+          <a href="{{ url_for('public.contact') }}" style="border:2px solid var(--maroon);color:var(--maroon);border-radius:8px;padding:10px 22px;font-weight:600;font-size:13.5px;transition:all .22s" onmouseover="this.style.background='var(--maroon)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='var(--maroon)'">
+            <i class="bi bi-envelope me-2"></i>Contact Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ── KABARAK AFFILIATION ──────────────────────────────────────────────────── #}
+<section class="section-padding bg-maroon-pale">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Partnership</span>
+      <h2 class="section-title">Our Kabarak University Affiliation</h2>
+      <div class="section-divider"></div>
+      <p class="section-desc mx-auto">MPSK is a proud affiliate of Kabarak University — sharing its campus, values, and vision for transformative, Christ-centred education.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      {% for icon, title, desc in [
+        ('bi-building','Shared Campus','We operate on the Kabarak University campus, providing our learners with access to university-grade facilities, grounds, and a rich academic environment.'),
+        ('bi-book-open','Shared Values','Both institutions are guided by the principle of Education in Biblical Perspective — forming whole people, not just exam performers.'),
+        ('bi-people','Collaborative Faculty','Our teachers benefit from the expertise and continuous professional development culture of the wider Kabarak University community.'),
+        ('bi-award','Accreditation & Standards','Our academic programmes are aligned with both KICD national standards and the quality benchmarks set by Kabarak University\'s education faculty.'),
+      ] %}
+      <div class="col-md-6 col-lg-3 fade-up" data-delay="{{ loop.index0 * 100 }}">
+        <div style="text-align:center;padding:28px 20px;background:var(--white);border-radius:var(--radius);border:1px solid var(--border-light);height:100%;transition:all .28s" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+          <div style="width:60px;height:60px;background:linear-gradient(145deg,var(--maroon),var(--maroon-deep));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;color:var(--gold)">
+            <i class="bi {{ icon }}"></i>
+          </div>
+          <h5 style="font-family:var(--font-serif);color:var(--maroon-deep);margin-bottom:10px">{{ title }}</h5>
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.65;margin:0">{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ── ACHIEVEMENTS ────────────────────────────────────────────────────────── #}
+{% if achievements %}
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Recognition</span>
+      <h2 class="section-title">Our Achievements</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      {% for a in achievements %}
+      <div class="col-sm-6 col-lg-4 fade-up" data-delay="{{ loop.index0 % 3 * 100 }}">
+        <div class="achievement-card h-100">
+          <div class="achievement-icon"><i class="bi bi-{{ a.get('icon','trophy-fill') }}"></i></div>
+          {% if a.get('year') %}<div class="achievement-year">{{ a.year }}</div>{% endif %}
+          <div class="achievement-title">{{ a.title }}</div>
+          <div class="achievement-desc">{{ a.get('description','') }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── STAFF ───────────────────────────────────────────────────────────────── #}
+{% if staff %}
+<section class="section-padding bg-cream" id="staff">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Our People</span>
+      <h2 class="section-title">Meet Our Team</h2>
+      <div class="section-divider"></div>
+      <p class="section-desc mx-auto">Experienced, TSC-registered educators committed to nurturing every learner's potential.</p>
+    </div>
+    <div class="row g-4">
+      {% for member in staff %}
+      <div class="col-sm-6 col-lg-3 fade-up" data-delay="{{ loop.index0 % 4 * 100 }}">
+        <div class="staff-card h-100">
+          {% set psrc = person_photo(member) %}
+          {% if psrc %}
+          <img src="{{ psrc }}" class="staff-photo" alt="{{ member.name }}" loading="lazy">
+          {% else %}
+          <div class="staff-photo-placeholder">{{ member.name[0] }}</div>
+          {% endif %}
+          <div class="staff-body">
+            <div class="staff-name">{{ member.name }}</div>
+            <div class="staff-role">{{ member.get('role','') }}</div>
+            {% if member.get('qualifications') %}<div class="staff-quals">{{ member.qualifications }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── TESTIMONIALS ────────────────────────────────────────────────────────── #}
+{% if testimonials %}
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <span class="section-tag">Community Voices</span>
+      <h2 class="section-title">What Parents Say</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      {% for t in testimonials[:3] %}
+      <div class="col-md-4 fade-up" data-delay="{{ loop.index0 * 150 }}">
+        <div class="testimonial-card h-100">
+          <div class="testimonial-stars">
+            {% for _ in range(t.get('rating',5)) %}<i class="bi bi-star-fill"></i>{% endfor %}
+          </div>
+          <div class="testimonial-text">"{{ t.text }}"</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">{{ t.name[0] }}</div>
+            <div>
+              <div class="testimonial-name">{{ t.name }}</div>
+              <div class="testimonial-role">{{ t.get('role','Parent') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── CTA ─────────────────────────────────────────────────────────────────── #}
+<section class="section-padding" style="background:linear-gradient(145deg,var(--maroon-deep),var(--maroon) 60%,var(--green-deep))">
+  <div class="container text-center">
+    <div class="col-lg-6 mx-auto fade-up">
+      <h2 class="section-title section-title-light mb-3">Become Part of Our Story</h2>
+      <p style="color:rgba(255,255,255,.8);margin-bottom:28px">Join a community where every child is known, nurtured, and empowered to excel.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="{{ url_for('public.admissions') }}" class="btn-hero-primary">
+          <i class="bi bi-person-plus-fill me-2"></i>Apply for Admission
+        </a>
+        <a href="{{ url_for('public.contact') }}" class="btn-hero-outline">
+          <i class="bi bi-envelope me-2"></i>Get in Touch
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

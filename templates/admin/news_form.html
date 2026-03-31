@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if article else 'New' }} Article{% endblock %}
+{% block page_title %}{{ 'Edit Article' if article else 'New Article' }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card-admin">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Article Title *</label>
+          <input type="text" id="f_title" class="form-control" placeholder="Enter article title" value="{{ article.title if article else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Category</label>
+          <select id="f_cat" class="form-select">
+            {% for c in ['News','Academic','Sports','Events','Achievements','Community','Announcements'] %}
+            <option {% if article and article.get('category') == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Date</label>
+          <input type="date" id="f_date" class="form-control" value="{% if article and article.date %}{% if article.date is string %}{{ article.date[:10] }}{% else %}{{ article.date.strftime('%Y-%m-%d') }}{% endif %}{% endif %}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Excerpt (short summary)</label>
+          <textarea id="f_excerpt" class="form-control" rows="2" placeholder="Brief summary shown in listing pages…">{{ article.get('excerpt','') if article else '' }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Full Content *</label>
+          <textarea id="f_content" class="form-control" rows="12" placeholder="Full article content…">{{ article.get('content','') if article else '' }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Author</label>
+          <input type="text" id="f_author" class="form-control" placeholder="e.g. School Administration" value="{{ article.get('author','') if article else '' }}">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-admin mb-4">
+      <h6 style="font-weight:700;color:var(--maroon-deep);margin-bottom:16px">Publish Settings</h6>
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select id="f_published" class="form-select">
+          <option value="true" {% if not article or article.get('published') %}selected{% endif %}>Published</option>
+          <option value="false" {% if article and not article.get('published') %}selected{% endif %}>Draft</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Featured on Homepage?</label>
+        <select id="f_featured" class="form-select">
+          <option value="true" {% if article and article.get('featured') %}selected{% endif %}>Yes</option>
+          <option value="false" {% if not article or not article.get('featured') %}selected{% endif %}>No</option>
+        </select>
+      </div>
+      <button onclick="saveArticle()" class="btn-maroon" style="width:100%;padding:11px">
+        <i class="bi bi-save me-2"></i>{{ 'Update Article' if article else 'Publish Article' }}
+      </button>
+      <a href="{{ url_for('admin.news') }}" style="display:block;text-align:center;margin-top:10px;font-size:13px;color:var(--text-muted)">Cancel</a>
+    </div>
+
+    <div class="card-admin">
+      <h6 style="font-weight:700;color:var(--maroon-deep);margin-bottom:12px">Cover Image</h6>
+      <label class="form-label" style="font-size:12px;color:#999">Image URL (paste a link)</label>
+      <input type="url" id="f_image_url" class="form-control mb-2" placeholder="https://images.unsplash.com/..." value="{{ article.get('image_url','') if article else '' }}">
+      {% if article and article.get('image') %}
+      <div class="mt-2">
+        <img src="{{ url_for('static', filename='uploads/' + article.image) }}" style="width:100%;border-radius:8px;max-height:140px;object-fit:cover">
+        <p style="font-size:11px;color:#999;margin-top:4px">Current image. Paste a new URL above to replace.</p>
+      </div>
+      {% elif article and article.get('image_url') %}
+      <div class="mt-2">
+        <img src="{{ article.image_url }}" style="width:100%;border-radius:8px;max-height:140px;object-fit:cover" onerror="this.style.display='none'">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+async function saveArticle() {
+  const title = document.getElementById('f_title').value.trim();
+  if (!title) { showToast('Title is required.', 'danger'); return; }
+  const data = {
+    title,
+    category: document.getElementById('f_cat').value,
+    date: document.getElementById('f_date').value,
+    excerpt: document.getElementById('f_excerpt').value,
+    content: document.getElementById('f_content').value,
+    author: document.getElementById('f_author').value,
+    image_url: document.getElementById('f_image_url').value,
+    published: document.getElementById('f_published').value === 'true',
+    featured: document.getElementById('f_featured').value === 'true',
+    {% if article %}id: '{{ article._id }}',{% endif %}
+  };
+  try {
+    const url = '{% if article %}{{ url_for("admin.save_news", id=article._id) }}{% else %}{{ url_for("admin.save_news") }}{% endif %}';
+    const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+    const d = await res.json();
+    if (d.success) { showToast(d.message, 'success'); setTimeout(() => window.location='{{ url_for("admin.news") }}', 1000); }
+    else showToast(d.message || 'Error saving.', 'danger');
+  } catch(e) { showToast('Network error.', 'danger'); }
+}
+</script>
+{% endblock %}

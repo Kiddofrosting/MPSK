@@ -1,0 +1,89 @@
+{% extends "admin/base.html" %}
+{% block title %}Achievements{% endblock %}
+{% block page_title %}Achievements{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Add trophies, awards, and milestones displayed on the website.</p>
+  <button class="btn-maroon" onclick="openAchModal()"><i class="bi bi-plus-lg me-2"></i>Add Achievement</button>
+</div>
+<div class="card-admin">
+  {% if achievements is defined and achievements %}
+  <div class="row g-3">
+    {% for a in achievements %}
+    <div class="col-sm-6 col-lg-4" id="ach-{{ a._id }}">
+      <div style="border:1px solid var(--border);border-radius:10px;padding:18px;background:#fff;position:relative">
+        <div style="font-size:1.8rem;color:var(--gold);margin-bottom:8px"><i class="bi bi-trophy-fill"></i></div>
+        {% if a.get('year') %}<div style="font-size:11px;font-weight:700;color:var(--maroon);text-transform:uppercase">{{ a.year }}</div>{% endif %}
+        <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--maroon-deep);margin:4px 0">{{ a.title }}</div>
+        {% if a.get('description') %}<div style="font-size:12.5px;color:var(--text-muted)">{{ a.description }}</div>{% endif %}
+        <div style="position:absolute;top:10px;right:10px;display:flex;gap:4px">
+          <button class="tbl-btn tbl-btn-edit edit-ach-btn" title="Edit"
+            data-id="{{ a._id }}"
+            data-title="{{ a.title }}"
+            data-year="{{ a.get('year','') }}"
+            data-description="{{ a.get('description','') }}"
+            data-category="{{ a.get('category','academic') }}"
+            data-order="{{ a.get('order',99) }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_achievement', id=a._id) }}','ach-{{ a._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-trophy"></i><h6>No achievements recorded</h6><p>Showcase your school's awards and milestones.</p></div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="achModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="achModalTitle">Add Achievement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_achievement') }}">
+          <input type="hidden" name="achievement_id" id="achievement_id">
+          <div class="mb-3"><label class="form-label">Title *</label><input type="text" name="title" id="ach_title" class="form-control" required placeholder="e.g. Zone Athletics Champions"></div>
+          <div class="row g-3 mb-3">
+            <div class="col-6"><label class="form-label">Year</label><input type="text" name="year" id="ach_year" class="form-control" placeholder="e.g. 2024"></div>
+            <div class="col-6"><label class="form-label">Category</label>
+              <select name="category" id="ach_cat" class="form-select">{% for c in ['academic','sports','arts','community','general'] %}<option value="{{ c }}">{{ c|capitalize }}</option>{% endfor %}</select>
+            </div>
+          </div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea name="description" id="ach_desc" class="form-control" rows="3" placeholder="Brief details about the achievement"></textarea></div>
+          <div class="mb-3"><label class="form-label">Display Order</label><input type="number" name="order" id="ach_order" class="form-control" value="99" min="1"></div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px"><i class="bi bi-trophy me-2"></i>Save Achievement</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openAchModal() {
+  document.getElementById('achModalTitle').textContent = 'Add Achievement';
+  document.getElementById('achievement_id').value = '';
+  ['ach_title','ach_year','ach_desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ach_order').value = '99';
+  document.getElementById('ach_cat').value = 'academic';
+  new bootstrap.Modal(document.getElementById('achModal')).show();
+}
+document.querySelectorAll('.edit-ach-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('achModalTitle').textContent = 'Edit Achievement';
+    document.getElementById('achievement_id').value = d.id;
+    document.getElementById('ach_title').value = d.title;
+    document.getElementById('ach_year').value = d.year;
+    document.getElementById('ach_desc').value = d.description;
+    document.getElementById('ach_cat').value = d.category;
+    document.getElementById('ach_order').value = d.order;
+    new bootstrap.Modal(document.getElementById('achModal')).show();
+  });
+});
+</script>
+{% endblock %}

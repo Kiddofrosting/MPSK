@@ -1,0 +1,29 @@
+{% extends "public/base.html" %}
+{% block title %}Privacy Policy — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container position-relative">
+    <h1 class="page-hero-title">Privacy Policy</h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px">Last updated: March 2026</p>
+  </div>
+</section>
+<section class="section-padding">
+  <div class="container"><div class="col-lg-8 mx-auto">
+    <p style="color:var(--text-mid);font-size:15px;line-height:1.8">
+      Moi Primary &amp; Junior School Kabarak ("MPSK", "we", "us") is committed to protecting the privacy of parents, students, and visitors to this website. This policy outlines how we collect, use, and protect your personal information in compliance with the Kenya Data Protection Act (2019).
+    </p>
+    {% for heading, content in [
+      ('Information We Collect', 'We collect personal information when you submit our contact form, admissions inquiry form, or subscribe to our newsletter. This includes your name, email address, phone number, and any details you voluntarily provide. We do not collect sensitive personal data without explicit consent.'),
+      ('How We Use Your Information', 'Information you provide is used solely to respond to your inquiry, process your admission application, or send you school updates you have subscribed to. We do not sell, rent, or share your personal data with third parties for marketing purposes.'),
+      ('Data Storage & Security', 'Your data is stored securely on password-protected servers. We implement industry-standard security measures including HTTPS encryption, access controls, and regular backups. Only authorised school staff can access submitted data.'),
+      ('Newsletter & Communications', 'If you subscribe to our newsletter, you may unsubscribe at any time by clicking the unsubscribe link in any email or by visiting our unsubscribe page. We will remove your email from our list within 48 hours.'),
+      ('Cookies', 'This website uses session cookies necessary for the site to function. We do not use tracking or advertising cookies. You may disable cookies in your browser settings, though some site features may be affected.'),
+      ('Your Rights', 'Under the Kenya Data Protection Act (2019), you have the right to access, correct, or request deletion of your personal data. To exercise these rights, contact us at ' + settings.get('email','info@mpsk.ac.ke') + '.'),
+      ('Contact', 'For privacy-related questions, contact: ' + settings.get('school_name','MPSK') + ', ' + settings.get('address','Kabarak, Nakuru County') + '. Email: ' + settings.get('email','info@mpsk.ac.ke') + '.'),
+    ] %}
+    <h4 style="font-family:var(--font-serif);color:var(--maroon-deep);margin-top:32px">{{ heading }}</h4>
+    <p style="color:var(--text-mid);font-size:15px;line-height:1.8">{{ content }}</p>
+    {% endfor %}
+  </div></div>
+</section>
+{% endblock %}

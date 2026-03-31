@@ -1,0 +1,82 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  {% for icon, label, key, accent in [
+    ('bi-newspaper','News Articles','news_count','maroon'),
+    ('bi-images','Gallery Photos','gallery_count','gold'),
+    ('bi-person-plus-fill','New Inquiries','inq_count','green'),
+    ('bi-envelope-fill','Messages','msg_count','maroon'),
+  ] %}
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card accent-{{ accent }}">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="stat-label">{{ label }}</div>
+          <div class="stat-num">{{ stats.get(key, 0) if stats is defined else '—' }}</div>
+        </div>
+        <div class="stat-icon stat-icon-{{ 'maroon' if accent == 'maroon' else ('gold' if accent == 'gold' else 'green') }}">
+          <i class="bi {{ icon }}"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card-admin">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin:0">Recent Inquiries</h5>
+        <a href="{{ url_for('admin.inquiries') }}" class="btn-maroon" style="font-size:12px;padding:6px 14px">View All</a>
+      </div>
+      {% if recent_inquiries is defined and recent_inquiries %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead><tr><th>Parent</th><th>Child</th><th>Grade</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for inq in recent_inquiries %}
+          <tr>
+            <td><span style="font-weight:600;color:var(--maroon-deep)">{{ inq.parent_name }}</span><br><small style="color:#999">{{ inq.email }}</small></td>
+            <td>{{ inq.child_name }}</td>
+            <td><span style="background:var(--maroon-light);color:var(--maroon);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">{{ inq.grade_applying }}</span></td>
+            <td style="color:#999;font-size:12px">{{ inq.date.strftime('%d %b') if inq.date else '' }}</td>
+            <td><span class="badge-status badge-{{ inq.get('status','new') }}">{{ inq.get('status','new')|capitalize }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-person-plus"></i><h6>No inquiries yet</h6><p style="font-size:13px">Admission enquiries will appear here.</p></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-admin h-100">
+      <h5 style="font-family:'Playfair Display',serif;color:var(--maroon-deep);margin-bottom:20px">Quick Actions</h5>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        {% for icon, label, href in [
+          ('bi-plus-circle','Add News Article', url_for('admin.news')),
+          ('bi-image','Upload Gallery Photo', url_for('admin.gallery')),
+          ('bi-images','Image Manager', url_for('admin.image_manager')),
+          ('bi-calendar-plus','Create Event', url_for('admin.events')),
+          ('bi-person-plus','Add Staff Member', url_for('admin.staff')),
+          ('bi-cash-coin','Update Fee Structure', url_for('admin.fees')),
+          ('bi-gear','Site Settings', url_for('admin.settings')),
+        ] %}
+        <a href="{{ href }}" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;text-decoration:none;transition:all .2s;color:var(--text-mid)" onmouseover="this.style.background='var(--maroon-light)';this.style.borderColor='var(--maroon)';this.style.color='var(--maroon)'" onmouseout="this.style.background='var(--bg)';this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">
+          <i class="bi {{ icon }}" style="font-size:16px;width:20px"></i>
+          <span style="font-size:13.5px;font-weight:600">{{ label }}</span>
+          <i class="bi bi-chevron-right ms-auto" style="font-size:11px;opacity:.4"></i>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

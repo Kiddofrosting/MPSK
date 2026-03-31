@@ -1,0 +1,58 @@
+/* MPSK Admin CSS — Kabarak Maroon Theme */
+/* Extends the base.html inline styles with additional admin-specific rules */
+
+:root {
+  --maroon: #6B1E2E;
+  --maroon-deep: #4A1020;
+  --maroon-mid: #8C2A3D;
+  --maroon-light: #F5E6E9;
+  --gold: #C9943A;
+  --gold-bright: #D4A843;
+  --green: #1A5E38;
+}
+
+/* Rich text editor tweaks */
+.ql-toolbar { border-radius: 8px 8px 0 0 !important; border-color: rgba(107,30,46,.15) !important; }
+.ql-container { border-radius: 0 0 8px 8px !important; border-color: rgba(107,30,46,.15) !important; min-height: 180px; }
+.ql-editor { font-family: 'Source Sans 3', sans-serif; font-size: 14px; }
+
+/* Image upload preview */
+.img-preview-wrap { position: relative; display: inline-block; }
+.img-preview-wrap img { border-radius: 8px; object-fit: cover; border: 2px solid var(--maroon-light); }
+.img-preview-remove { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; background: var(--maroon); color: #fff; border: none; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* Status toggle */
+.toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 24px; transition: .3s; }
+.toggle-slider::before { position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .3s; }
+input:checked + .toggle-slider { background: var(--maroon); }
+input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+/* Table action buttons */
+.tbl-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: all .15s; }
+.tbl-btn-edit { background: rgba(107,30,46,.08); color: var(--maroon); }
+.tbl-btn-edit:hover { background: var(--maroon); color: #fff; }
+.tbl-btn-delete { background: rgba(211,47,47,.08); color: #d32f2f; }
+.tbl-btn-delete:hover { background: #d32f2f; color: #fff; }
+.tbl-btn-view { background: rgba(26,94,56,.08); color: var(--green); }
+.tbl-btn-view:hover { background: var(--green); color: #fff; }
+
+/* Empty states */
+.empty-state { text-align: center; padding: 56px 24px; color: #999; }
+.empty-state i { font-size: 3rem; opacity: .25; margin-bottom: 12px; }
+.empty-state h6 { color: #666; }
+
+/* Login page */
+.login-card { background: #fff; border-radius: 16px; padding: 44px; box-shadow: 0 8px 40px rgba(107,30,46,.15); border-top: 4px solid var(--maroon); max-width: 420px; width: 100%; }
+.login-page-bg { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(145deg, var(--maroon-deep), var(--maroon) 60%, #0D3B24); }
+
+/* Dashboard quick stats accent colors */
+.accent-maroon { border-left: 3px solid var(--maroon) !important; }
+.accent-gold { border-left: 3px solid var(--gold) !important; }
+.accent-green { border-left: 3px solid var(--green) !important; }
+
+/* Modals */
+.modal-header { border-bottom: 2px solid var(--maroon-light); }
+.modal-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--maroon-deep); }
+.modal-footer { border-top: 1px solid var(--maroon-light); }

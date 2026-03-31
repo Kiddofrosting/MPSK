@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+{% block title %}Fee Structure{% endblock %}
+{% block page_title %}Fee Structure{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Manage tuition and fee information displayed on the Admissions page.</p>
+  <button class="btn-maroon" onclick="openFeeModal()"><i class="bi bi-plus-lg me-2"></i>Add Fee Row</button>
+</div>
+
+<div class="card-admin">
+  {% if fees is defined and fees %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Grade / Level</th><th>Tuition (KES)</th><th>Activity Levy</th><th>Boarding</th><th>Total / Term</th><th>Order</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for f in fees %}
+      <tr id="fee-{{ f._id }}">
+        <td style="font-weight:600;color:var(--maroon-deep)">{{ f.grade }}</td>
+        <td><span style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:800;color:var(--maroon)">{{ f.get('tuition') | money }}</span></td>
+        <td style="font-size:13.5px">{% if f.get('boarding') %}{{ f.boarding | money }}{% else %}Day only{% endif %}</td>
+        <td style="font-size:13.5px">{{ f.get('activity') | money }}</td>
+        <td><strong style="color:var(--maroon-deep)">{{ f.get('total') | money }}</strong></td>
+        <td style="font-size:13px;color:#999">{{ f.get('order',1) }}</td>
+        <td style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-edit edit-fee-btn" title="Edit"
+            data-id="{{ f._id }}"
+            data-grade="{{ f.grade }}"
+            data-tuition="{{ f.get('tuition','') }}"
+            data-activity="{{ f.get('activity','') }}"
+            data-boarding="{{ f.get('boarding','') }}"
+            data-total="{{ f.get('total','') }}"
+            data-order="{{ f.get('order',99) }}"
+            data-notes="{{ f.get('notes','') }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_fee', id=f._id) }}','fee-{{ f._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-cash-coin"></i><h6>No fee structure added</h6><p>Add fee rows so parents can see current rates.</p></div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="feeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feeModalTitle">Add Fee Row</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_fee') }}">
+          <input type="hidden" name="fee_id" id="fee_id">
+          <div class="mb-3"><label class="form-label">Grade / Level *</label><input type="text" name="grade" id="f_grade" class="form-control" required placeholder="e.g. Grade 4-6"></div>
+          <div class="row">
+            <div class="col-6 mb-3"><label class="form-label">Tuition (KES) *</label><input type="number" name="tuition" id="f_tuition" class="form-control" required placeholder="18000" oninput="calcTotal()"></div>
+            <div class="col-6 mb-3"><label class="form-label">Activity Levy (KES)</label><input type="number" name="activity" id="f_activity" class="form-control" placeholder="3000" oninput="calcTotal()"></div>
+          </div>
+          <div class="mb-3"><label class="form-label">Boarding Fee (KES - leave blank if day only)</label><input type="number" name="boarding" id="f_boarding" class="form-control" placeholder="Optional" oninput="calcTotal()"></div>
+          <div class="mb-3">
+            <label class="form-label">Total / Term (KES)</label>
+            <input type="number" name="total" id="f_total" class="form-control" placeholder="Auto-calculated">
+            <div class="form-text">Auto-filled from above fields, or enter manually to override.</div>
+          </div>
+          <div class="mb-3"><label class="form-label">Notes (optional)</label><input type="text" name="notes" id="f_notes" class="form-control" placeholder="e.g. Includes lunch"></div>
+          <div class="mb-3"><label class="form-label">Display Order</label><input type="number" name="order" id="f_order" class="form-control" value="99" min="1"></div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px"><i class="bi bi-save me-2"></i>Save Fee Row</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openFeeModal() {
+  document.getElementById('feeModalTitle').textContent = 'Add Fee Row';
+  document.getElementById('fee_id').value = '';
+  ['f_grade','f_tuition','f_activity','f_boarding','f_total','f_notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f_order').value = '99';
+  new bootstrap.Modal(document.getElementById('feeModal')).show();
+}
+document.querySelectorAll('.edit-fee-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('feeModalTitle').textContent = 'Edit Fee Row';
+    document.getElementById('fee_id').value = d.id;
+    document.getElementById('f_grade').value = d.grade;
+    document.getElementById('f_tuition').value = d.tuition;
+    document.getElementById('f_activity').value = d.activity;
+    document.getElementById('f_boarding').value = d.boarding;
+    document.getElementById('f_total').value = d.total;
+    document.getElementById('f_order').value = d.order;
+    document.getElementById('f_notes').value = d.notes;
+    new bootstrap.Modal(document.getElementById('feeModal')).show();
+  });
+});
+function calcTotal() {
+  const t = parseFloat(document.getElementById('f_tuition').value) || 0;
+  const a = parseFloat(document.getElementById('f_activity').value) || 0;
+  const b = parseFloat(document.getElementById('f_boarding').value) || 0;
+  if (t > 0) document.getElementById('f_total').value = t + a + b;
+}
+</script>
+{% endblock %}

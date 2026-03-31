@@ -1,0 +1,107 @@
+PROPOSAL: MPSK KABARAK SCHOOL WEBSITE
+======================================
+Prepared by: [Your Name / Company]
+Date: March 31, 2026
+To: Management — Mount Pleasant School Kabarak (MPSK)
+
+
+OVERVIEW
+--------
+We are pleased to present the completed MPSK Kabarak school website, built specifically
+for your institution. The site is a modern, fully-functional web presence designed to
+serve parents, prospective students, and the wider school community.
+
+
+WHAT HAS BEEN DELIVERED
+------------------------
+A complete school website with the following pages and features:
+
+  PUBLIC PAGES
+  - Homepage        — Hero section, news highlights, events, staff, testimonials,
+                       achievements, and gallery
+  - About           — School history, mission, vision, leadership team
+  - Academics       — CBC curriculum overview, learning stages
+  - Admissions      — Fees structure, admission process, online inquiry form
+  - School Life     — Gallery, activities, clubs, boarding life
+  - News & Blog     — Articles with images, categories, and detail pages
+  - Events          — Upcoming school events calendar
+  - Gallery         — Photo gallery with categories
+  - Contact         — Contact form, map location, office hours
+  - FAQ             — Frequently asked questions
+  - Privacy Policy  — GDPR-compliant privacy page
+
+  ADMIN PANEL (/admin)
+  - Dashboard       — Quick stats and recent activity overview
+  - Content Manager — Edit all site content (news, events, gallery, staff, FAQs,
+                       achievements, testimonials, fees)
+  - Settings        — Update site name, logo, hero images, contact details,
+                       social media links, and branding colours
+  - Messages        — View and manage contact form submissions
+  - Newsletter      — Manage newsletter subscribers
+  - Image Manager   — Upload and manage site images
+  - Maintenance Mode — Take the site offline with one click during updates
+
+
+TECHNOLOGY STACK
+----------------
+  Backend:    Python / Flask (lightweight, industry-proven web framework)
+  Database:   MongoDB (flexible, scalable NoSQL database)
+  Frontend:   HTML5, CSS3, Vanilla JavaScript (no heavy frameworks, fast loading)
+  Hosting:    Render.com (free tier available, scales easily as traffic grows)
+  Database:   MongoDB Atlas (managed cloud database, free tier available)
+
+
+DEPLOYMENT
+----------
+The site is ready to go live. We have configured it for one-click deployment on
+Render.com. The steps are straightforward:
+
+  1. A MongoDB Atlas account is created (free) — this is where all school data lives.
+  2. The code is pushed to GitHub.
+  3. A Render Web Service is created and connected to the repository.
+  4. Environment variables (database URL and secret key) are set in Render dashboard.
+  5. The site is live within minutes at an HTTPS URL (e.g. mpsk-kabarak.onrender.com).
+  6. A custom domain (e.g. mpsk.ac.ke) can be pointed to Render at no extra charge.
+
+
+RUNNING COSTS
+-------------
+  Render Free Tier    — KES 0/month (site sleeps after 15 min inactivity,
+                          ideal for low-traffic launch phase)
+  Render Starter Plan — ~$7/month (~KES 900/month) for always-on hosting
+  MongoDB Atlas Free  — KES 0/month (512 MB storage, sufficient for school data)
+  Custom Domain       — Varies (~KES 1,000–2,500/year depending on registrar)
+
+  Estimated running cost: KES 0–900/month depending on chosen hosting tier.
+
+
+HANDOVER & SUPPORT
+------------------
+Upon acceptance, we will:
+  - Deploy the live site to Render under your accounts
+  - Provide a walkthrough of the admin panel so your team can manage content
+  - Hand over all source code and credentials
+  - Provide 30 days of free bug-fix support after go-live
+
+We are happy to discuss ongoing maintenance, feature additions, or a custom domain
+setup as separate engagements.
+
+
+NEXT STEPS
+----------
+  1. Review the attached site files / demo link
+  2. Confirm acceptance and provide your MongoDB Atlas and Render account details
+     (or we set them up for you)
+  3. We deploy and hand over — typically done within 24 hours
+
+We believe this website will be a valuable asset for MPSK Kabarak, improving
+communication with parents, making admissions more accessible, and strengthening
+the school's digital presence in the community.
+
+We look forward to your feedback.
+
+
+Regards,
+[Your Name]
+[Your Contact / Email]
+[Your Phone Number]

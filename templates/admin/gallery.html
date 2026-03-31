@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% block title %}Gallery{% endblock %}
+{% block page_title %}Gallery{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Upload and manage school photos.</p>
+  <button class="btn-maroon" data-bs-toggle="modal" data-bs-target="#uploadModal">
+    <i class="bi bi-cloud-upload me-2"></i>Upload Photo
+  </button>
+</div>
+
+<div class="card-admin">
+  {% if items is defined and items %}
+  <div class="row g-3">
+    {% for item in items %}
+    {% set src = item.get('image_url') or (url_for('static', filename='uploads/' + item.image) if item.get('image') else '') %}
+    <div class="col-sm-6 col-md-4 col-lg-3" id="gal-{{ item._id }}">
+      <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)">
+        {% if src %}
+        <img src="{{ src }}" style="width:100%;height:150px;object-fit:cover" loading="lazy">
+        {% else %}
+        <div style="width:100%;height:150px;background:var(--maroon-light);display:flex;align-items:center;justify-content:center"><i class="bi bi-image" style="font-size:2.5rem;color:var(--maroon);opacity:.4"></i></div>
+        {% endif %}
+        <div style="padding:12px">
+          <div style="font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:4px">{{ item.get('title') or item.get('caption','No caption') }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+            <span style="background:var(--maroon-light);color:var(--maroon);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">{{ item.get('category','General') }}</span>
+            <div style="display:flex;gap:4px">
+              {% if item.get('featured') %}<span style="background:#d1fae5;color:#065f46;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700">Featured</span>{% endif %}
+              <button onclick="deleteItem('{{ url_for('admin.delete_gallery', id=item._id) }}','gal-{{ item._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-images"></i><h6>No photos yet</h6><p>Upload your first photo to get started.</p></div>
+  {% endif %}
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Upload Photo</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.gallery_upload') }}" enctype="multipart/form-data">
+          <div class="mb-3"><label class="form-label">Photo File(s)</label><input type="file" name="images" class="form-control" accept="image/*" multiple></div>
+          <div class="mb-3">
+            <label class="form-label">— OR — Image URL</label>
+            <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+            <div class="form-text">Paste a URL to use instead of uploading a file</div>
+          </div>
+          <div class="mb-3"><label class="form-label">Caption / Title</label><input type="text" name="title" class="form-control" placeholder="Describe the photo"></div>
+          <div class="mb-3"><label class="form-label">Category</label>
+            <select name="category" class="form-select">
+              {% for c in ['Academic','Sports','Events','Arts','Community','General'] %}<option>{{ c }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">Featured on homepage?</label>
+            <select name="featured" class="form-select"><option value="true">Yes</option><option value="false">No</option></select>
+          </div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px"><i class="bi bi-cloud-upload me-2"></i>Upload Photo</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

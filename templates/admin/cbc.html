@@ -1,0 +1,87 @@
+{% extends "admin/base.html" %}
+{% block title %}CBC Strands{% endblock %}
+{% block page_title %}CBC Learning Strands{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">Define the CBC learning areas displayed on the Academics page.</p>
+  <button class="btn-maroon" onclick="openCbcModal()"><i class="bi bi-plus-lg me-2"></i>Add Strand</button>
+</div>
+<div class="card-admin">
+  {% if strands is defined and strands %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Strand Name</th><th>Icon</th><th>Grades</th><th>Order</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for s in strands %}
+      <tr id="cbc-{{ s._id }}">
+        <td><div style="font-weight:600;color:var(--maroon-deep)">{{ s.name }}</div>{% if s.get('description') %}<small style="color:#999">{{ s.description[:60] }}</small>{% endif %}</td>
+        <td><i class="bi {{ s.get('icon','bi-journal') }}" style="font-size:18px;color:var(--maroon)"></i> <small style="color:#999">{{ s.get('icon','') }}</small></td>
+        <td style="font-size:13px">{{ s.get('grades','PP1–Grade 9') }}</td>
+        <td style="font-size:13px;color:#999">{{ s.get('order',1) }}</td>
+        <td style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-edit edit-cbc-btn" title="Edit"
+            data-id="{{ s._id }}"
+            data-name="{{ s.name }}"
+            data-icon="{{ s.get('icon','bi-journal') }}"
+            data-grades="{{ s.get('grades','') }}"
+            data-description="{{ s.get('description','') }}"
+            data-order="{{ s.get('order',99) }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_cbc', id=s._id) }}','cbc-{{ s._id }}')" class="tbl-btn tbl-btn-delete" title="Delete"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-journal-bookmark"></i><h6>No CBC strands added</h6><p>Add learning strands to display on the Academics page.</p></div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="cbcModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cbcModalTitle">Add CBC Strand</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_cbc') }}">
+          <input type="hidden" name="strand_id" id="strand_id">
+          <div class="mb-3"><label class="form-label">Strand Name *</label><input type="text" name="name" id="cbc_name" class="form-control" required placeholder="e.g. Mathematics"></div>
+          <div class="mb-3"><label class="form-label">Bootstrap Icon Class</label><input type="text" name="icon" id="cbc_icon" class="form-control" placeholder="e.g. bi-calculator"><div class="form-text">Browse icons at <a href="https://icons.getbootstrap.com" target="_blank">icons.getbootstrap.com</a></div></div>
+          <div class="mb-3"><label class="form-label">Grades Covered</label><input type="text" name="grades" id="cbc_grades" class="form-control" placeholder="e.g. PP1–Grade 9"></div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea name="description" id="cbc_desc" class="form-control" rows="3"></textarea></div>
+          <div class="mb-3"><label class="form-label">Display Order</label><input type="number" name="order" id="cbc_order" class="form-control" value="99" min="1"></div>
+          <button type="submit" class="btn-maroon" style="width:100%;padding:11px">Save Strand</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openCbcModal() {
+  document.getElementById('cbcModalTitle').textContent = 'Add CBC Strand';
+  document.getElementById('strand_id').value = '';
+  ['cbc_name','cbc_icon','cbc_grades','cbc_desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cbc_order').value = '99';
+  new bootstrap.Modal(document.getElementById('cbcModal')).show();
+}
+document.querySelectorAll('.edit-cbc-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('cbcModalTitle').textContent = 'Edit CBC Strand';
+    document.getElementById('strand_id').value = d.id;
+    document.getElementById('cbc_name').value = d.name;
+    document.getElementById('cbc_icon').value = d.icon;
+    document.getElementById('cbc_grades').value = d.grades;
+    document.getElementById('cbc_desc').value = d.description;
+    document.getElementById('cbc_order').value = d.order;
+    new bootstrap.Modal(document.getElementById('cbcModal')).show();
+  });
+});
+</script>
+{% endblock %}

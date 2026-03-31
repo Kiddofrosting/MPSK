@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maintenance — MPSK</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--maroon:#6B1E2E;--maroon-deep:#4A1020;--gold:#C9943A;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:linear-gradient(145deg,var(--maroon-deep),var(--maroon));min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:24px}
+.crest{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Playfair Display',serif;font-size:28px;font-weight:800;color:var(--gold)}
+h1{font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:12px}
+p{color:rgba(255,255,255,.72);line-height:1.7;max-width:420px;margin:0 auto 28px;font-size:15px}
+.badge{background:rgba(201,148,58,.2);border:1px solid rgba(201,148,58,.4);color:var(--gold);padding:6px 18px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:inline-block;margin-bottom:20px}
+</style>
+</head>
+<body>
+<div>
+  <div class="crest">M</div>
+  <div class="badge">⚙ Maintenance Mode</div>
+  <h1>We'll Be Right Back</h1>
+  <p>MPSK's website is undergoing scheduled maintenance to serve you better. Please check back shortly or contact us directly.</p>
+  <p><strong style="color:var(--gold)">{{ settings.get('phone','+254 729 223 370') if settings is defined else '+254 729 223 370' }}</strong></p>
+</div>
+</body>
+</html>

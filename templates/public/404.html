@@ -1,0 +1,17 @@
+{% extends "public/base.html" %}
+{% block title %}Page Not Found — {{ settings.get('school_name','MPSK') }}{% endblock %}
+{% block content %}
+<section style="min-height:70vh;display:flex;align-items:center;background:var(--cream)">
+  <div class="container text-center py-5">
+    <div style="font-family:var(--font-serif);font-size:8rem;font-weight:800;color:var(--maroon-light);line-height:1">404</div>
+    <h2 style="font-family:var(--font-serif);color:var(--maroon-deep);margin-top:-16px;font-size:2rem">Page Not Found</h2>
+    <p style="color:var(--text-muted);max-width:400px;margin:16px auto 32px;font-size:15px">The page you're looking for doesn't exist or may have been moved. Let's get you back on track.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{{ url_for('public.index') }}" class="btn-primary-school"><i class="bi bi-house-fill me-2"></i>Go Home</a>
+      <a href="{{ url_for('public.contact') }}" style="border:2px solid var(--maroon);color:var(--maroon);border-radius:8px;padding:10px 22px;font-weight:600;font-size:13.5px;transition:all .2s;display:inline-flex;align-items:center;gap:8px">
+        <i class="bi bi-envelope"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

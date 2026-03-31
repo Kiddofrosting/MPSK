@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% block title %}Newsletter{% endblock %}
+{% block page_title %}Newsletter Subscribers{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card accent-maroon">
+      <div class="stat-label">Total Subscribers</div>
+      <div class="stat-num">{{ subscribers|length if subscribers is defined else 0 }}</div>
+    </div>
+  </div>
+</div>
+<div class="card-admin">
+  {% if subscribers is defined and subscribers %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p style="color:var(--text-muted);font-size:13.5px;margin:0">All active email subscribers</p>
+    <button onclick="exportCSV()" class="btn-maroon" style="font-size:12px;padding:7px 16px"><i class="bi bi-download me-2"></i>Export CSV</button>
+  </div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>#</th><th>Email</th><th>Subscribed</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for sub in subscribers %}
+      <tr id="sub-{{ sub._id }}">
+        <td style="color:#999;font-size:13px">{{ loop.index }}</td>
+        <td style="font-weight:500;color:var(--maroon-deep)"><a href="mailto:{{ sub.email }}" style="color:var(--maroon)">{{ sub.email }}</a></td>
+        <td style="font-size:12.5px;color:#999">{{ sub.date.strftime('%d %b %Y') if sub.date else '—' }}</td>
+        <td><span class="badge-status {% if sub.get('active') %}badge-published{% else %}badge-pending{% endif %}">{{ 'Active' if sub.get('active') else 'Unsubscribed' }}</span></td>
+        <td><button onclick="deleteItem('{{ url_for('admin.delete_subscriber', id=sub._id) }}','sub-{{ sub._id }}')" class="tbl-btn tbl-btn-delete"><i class="bi bi-trash"></i></button></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-mailbox2"></i><h6>No subscribers yet</h6><p>Newsletter sign-ups from the website will appear here.</p></div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function exportCSV() {
+  const rows = [['Email','Date']];
+  document.querySelectorAll('tbody tr').forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length >= 2) rows.push([tds[1]?.textContent?.trim(), tds[2]?.textContent?.trim()]);
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'mpsk_newsletter_subscribers.csv';
+  a.click();
+}
+</script>
+{% endblock %}

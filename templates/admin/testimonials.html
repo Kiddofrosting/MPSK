@@ -1,0 +1,174 @@
+{% extends "admin/base.html" %}
+{% block title %}Testimonials{% endblock %}
+{% block page_title %}Testimonials{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <p style="color:var(--text-muted);margin:0">
+    Manage parent and student testimonials shown on the homepage.
+  </p>
+  <button class="btn-maroon" onclick="openTestModal()">
+    <i class="bi bi-plus-lg me-2"></i>Add Testimonial
+  </button>
+</div>
+
+<div class="card-admin">
+  {% if testimonials is defined and testimonials %}
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Rating</th>
+          <th>Excerpt</th>
+          <th>Status</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for t in testimonials %}
+      <tr id="test-{{ t.get('_id') }}">
+        <td style="font-weight:600;color:var(--maroon-deep)">{{ t.get('name','') }}</td>
+        <td style="font-size:13px;color:var(--text-muted)">{{ t.get('role','Parent') }}</td>
+        <td>
+          {% for i in range(t.get('rating',5)) %}
+            <i class="bi bi-star-fill" style="color:var(--gold);font-size:12px"></i>
+          {% endfor %}
+        </td>
+        <td style="font-size:13px;color:var(--text-muted);max-width:200px">
+          {{ (t.get('text',''))[:80] }}
+          {% if t.get('text') and t.get('text')|length > 80 %}…{% endif %}
+        </td>
+        <td>
+          {% if t.get('active') %}
+            <span class="badge-status badge-published">Live</span>
+          {% else %}
+            <span class="badge-status badge-pending">Hidden</span>
+          {% endif %}
+        </td>
+        <td style="font-size:13px;color:#999">{{ t.get('order',99) }}</td>
+        <td style="display:flex;gap:6px">
+          <button class="tbl-btn tbl-btn-edit edit-test-btn" title="Edit"
+            data-id="{{ t.get('_id') }}"
+            data-name="{{ t.get('name','') }}"
+            data-role="{{ t.get('role','') }}"
+            data-text="{{ t.get('text','') }}"
+            data-rating="{{ t.get('rating',5) }}"
+            data-active="{{ 'true' if t.get('active') else 'false' }}"
+            data-order="{{ t.get('order',99) }}"
+            data-photo-url="{{ t.get('photo_url','') }}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button onclick="deleteItem('{{ url_for('admin.delete_testimonial', id=t.get('_id')) }}','test-{{ t.get('_id') }}')"
+            class="tbl-btn tbl-btn-delete" title="Delete">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-chat-quote"></i>
+    <h6>No testimonials yet</h6>
+    <p>Add parent feedback to build trust with prospective families.</p>
+  </div>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="testModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="testModalTitle">Add Testimonial</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.save_testimonial') }}">
+          <input type="hidden" name="testimonial_id" id="testimonial_id">
+          <div class="mb-3">
+            <label class="form-label">Name *</label>
+            <input type="text" name="name" id="t_name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <input type="text" name="role" id="t_role" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Testimonial Text *</label>
+            <textarea name="text" id="t_text" class="form-control" rows="4" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reviewer Photo <span style="font-size:12px;color:#999">(optional)</span></label>
+            <div style="background:var(--bg-soft,#f8f5f5);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
+              <input type="file" name="photo" id="t_photo_file" class="form-control form-control-sm mb-2" accept="image/*">
+              <div style="text-align:center;font-size:11px;color:#bbb;margin:4px 0;font-weight:600">— OR —</div>
+              <input type="url" name="photo_url" id="t_photo_url" class="form-control form-control-sm mt-2" placeholder="https://example.com/portrait.jpg">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">Rating</label>
+              <select name="rating" id="t_rating" class="form-select">
+                {% for i in [5,4,3,2,1] %}
+                <option value="{{ i }}">{{ i }} Stars</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">Order</label>
+              <input type="number" name="order" id="t_order" class="form-control" value="99">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Visibility</label>
+            <select name="published" id="t_published" class="form-select">
+              <option value="true">Live</option>
+              <option value="false">Hidden</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-maroon" style="width:100%">Save Testimonial</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openTestModal() {
+  document.getElementById('testModalTitle').textContent = 'Add Testimonial';
+  ['testimonial_id','t_name','t_role','t_text','t_photo_url'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const pf = document.getElementById('t_photo_file');
+  if (pf) pf.value = '';
+  document.getElementById('t_order').value = '99';
+  document.getElementById('t_rating').value = '5';
+  document.getElementById('t_published').value = 'true';
+  new bootstrap.Modal(document.getElementById('testModal')).show();
+}
+document.querySelectorAll('.edit-test-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    document.getElementById('testModalTitle').textContent = 'Edit Testimonial';
+    document.getElementById('testimonial_id').value = d.id;
+    document.getElementById('t_name').value = d.name;
+    document.getElementById('t_role').value = d.role;
+    document.getElementById('t_text').value = d.text;
+    document.getElementById('t_rating').value = d.rating;
+    document.getElementById('t_order').value = d.order;
+    document.getElementById('t_published').value = d.active === 'true' ? 'true' : 'false';
+    const pu = document.getElementById('t_photo_url');
+    if (pu) pu.value = d.photoUrl || '';
+    const pf = document.getElementById('t_photo_file');
+    if (pf) pf.value = '';
+    new bootstrap.Modal(document.getElementById('testModal')).show();
+  });
+});
+</script>
+{% endblock %}

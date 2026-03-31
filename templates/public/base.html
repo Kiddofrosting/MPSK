@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}MPSK — Moi Primary & Junior School Kabarak{% endblock %}</title>
+<meta name="description" content="{% block meta_desc %}{{ settings.get('meta_description','Moi Primary & Junior School Kabarak — Excellence in Education, Rooted in Christian Values') }}{% endblock %}">
+{% if settings.get('meta_keywords') %}<meta name="keywords" content="{{ settings.meta_keywords }}">{% endif %}
+<meta name="robots" content="index, follow">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ settings.get('school_name','MPSK') }}">
+<meta property="og:title" content="{% block og_title %}{{ settings.get('school_name','MPSK') }} — {{ settings.get('tagline','Excellence Through Faith') }}{% endblock %}">
+<meta property="og:description" content="{{ settings.get('meta_description','Moi Primary & Junior School Kabarak — CBC education from PP1 to Grade 9, rooted in Christian values.') }}">
+{% if settings.get('og_image') %}<meta property="og:image" content="{{ settings.og_image }}">{% endif %}
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ settings.get('school_name','MPSK') }}">
+<meta name="twitter:description" content="{{ settings.get('meta_description','Moi Primary & Junior School Kabarak') }}">
+{% if settings.get('og_image') %}<meta name="twitter:image" content="{{ settings.og_image }}">{% endif %}
+<!-- Favicon -->
+{% if settings.get('school_logo') %}<link rel="icon" type="image/x-icon" href="{{ settings.school_logo }}">{% endif %}
+{% if settings.get('ga_id') %}
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.ga_id }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ settings.ga_id }}');</script>
+{% endif %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{# ── ANNOUNCEMENT BANNER ─────────────────────────────────────── #}
+{% if settings.get('announcement_text') and settings.get('announcement_active') %}
+<div id="announcementBanner" style="background:{{ settings.get('announcement_color','#6B1E2E') }};color:#fff;padding:10px 20px;text-align:center;font-size:13.5px;font-weight:600;position:relative;z-index:1100;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
+  {% if settings.get('announcement_icon') %}<i class="bi bi-{{ settings.announcement_icon }}" style="font-size:15px;flex-shrink:0"></i>{% endif %}
+  <span>{{ settings.announcement_text }}</span>
+  {% if settings.get('announcement_link') %}
+  <a href="{{ settings.announcement_link }}" style="color:var(--gold-bright,#f0c040);font-weight:700;text-decoration:underline;white-space:nowrap">{{ settings.get('announcement_link_text','Learn more') }} →</a>
+  {% endif %}
+  <button onclick="document.getElementById('announcementBanner').style.display='none';sessionStorage.setItem('annDismissed','1')"
+    style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px"
+    aria-label="Dismiss">&times;</button>
+</div>
+<script>if(sessionStorage.getItem('annDismissed'))document.getElementById('announcementBanner').style.display='none';</script>
+{% endif %}
+
+{# ── FLASH MESSAGES ──────────────────────────────────────────── #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-container">
+  {% for cat, msg in messages %}
+  <div class="alert alert-{{ 'success' if cat == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+    {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+{# ── TOPBAR ──────────────────────────────────────────────────── #}
+<div class="topbar">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3 topbar-left">
+        <span><i class="bi bi-telephone-fill me-1" style="color:var(--gold)"></i>{{ settings.get('phone', '+254 729 223 370') }}</span>
+        <div class="topbar-divider"></div>
+        <span><i class="bi bi-envelope-fill me-1" style="color:var(--gold)"></i>{{ settings.get('email', 'info@mpsk.kabarak.ac.ke') }}</span>
+        <div class="topbar-divider d-none d-md-block"></div>
+        <span class="d-none d-md-inline"><i class="bi bi-geo-alt-fill me-1" style="color:var(--gold)"></i>Kabarak, Nakuru County</span>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="topbar-social d-flex align-items-center gap-1">
+          {% if settings.get('facebook') %}<a href="{{ settings.facebook }}" target="_blank"><i class="bi bi-facebook"></i></a>{% endif %}
+          {% if settings.get('twitter') %}<a href="{{ settings.twitter }}" target="_blank"><i class="bi bi-twitter-x"></i></a>{% endif %}
+          {% if settings.get('instagram') %}<a href="{{ settings.instagram }}" target="_blank"><i class="bi bi-instagram"></i></a>{% endif %}
+          {% if settings.get('youtube') %}<a href="{{ settings.youtube }}" target="_blank"><i class="bi bi-youtube"></i></a>{% endif %}
+        </div>
+        <div class="topbar-divider"></div>
+        <a href="{{ url_for('admin.dashboard') }}" class="topbar-admin-link"><i class="bi bi-shield-lock-fill me-1"></i>Staff Portal</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── NAVBAR ──────────────────────────────────────────────────── #}
+<nav class="main-navbar" id="mainNav">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('public.index') }}" class="d-flex align-items-center gap-3 text-decoration-none">
+        {% if settings.get('school_logo') %}
+        <img src="{{ settings.school_logo }}" alt="{{ settings.get('school_name','MPSK') }} logo" style="height:48px;width:48px;object-fit:contain;border-radius:8px">
+        {% else %}
+        <div class="school-crest">
+          <span class="crest-inner">M</span>
+        </div>
+        {% endif %}
+        <div>
+          <span class="brand-name">{{ settings.get('school_name', 'MPSK') }}</span>
+          <span class="brand-sub">Kabarak · Since {{ settings.get('founded', '2002') }}</span>
+          <span class="brand-motto">Education in Biblical Perspective</span>
+        </div>
+      </a>
+
+      <div class="d-none d-lg-flex align-items-center gap-1">
+        <a href="{{ url_for('public.index') }}" class="nav-link {% if request.endpoint == 'public.index' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('public.about') }}" class="nav-link {% if request.endpoint == 'public.about' %}active{% endif %}">About</a>
+        <div class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle {% if request.endpoint in ['public.academics','public.admissions'] %}active{% endif %}" data-bs-toggle="dropdown">Academics</a>
+          <ul class="dropdown-menu">
+            <li><a href="{{ url_for('public.academics') }}" class="dropdown-item"><i class="bi bi-journal-bookmark me-2 text-muted"></i>CBC Curriculum</a></li>
+            <li><a href="{{ url_for('public.admissions') }}" class="dropdown-item"><i class="bi bi-person-plus me-2 text-muted"></i>Admissions</a></li>
+            <li><a href="{{ url_for('public.admissions') }}#fees" class="dropdown-item"><i class="bi bi-cash-coin me-2 text-muted"></i>Fee Structure</a></li>
+            <li><a href="{{ url_for('public.faq') }}" class="dropdown-item"><i class="bi bi-question-circle me-2 text-muted"></i>FAQs</a></li>
+          </ul>
+        </div>
+        <a href="{{ url_for('public.life') }}" class="nav-link {% if request.endpoint == 'public.life' %}active{% endif %}">School Life</a>
+        <a href="{{ url_for('public.news') }}" class="nav-link {% if 'news' in request.endpoint %}active{% endif %}">News</a>
+        <a href="{{ url_for('public.events') }}" class="nav-link {% if request.endpoint == 'public.events' %}active{% endif %}">Events</a>
+        <a href="{{ url_for('public.gallery') }}" class="nav-link {% if request.endpoint == 'public.gallery' %}active{% endif %}">Gallery</a>
+        <a href="{{ url_for('public.contact') }}" class="nav-link {% if request.endpoint == 'public.contact' %}active{% endif %}">Contact</a>
+        <a href="{{ url_for('public.admissions') }}" class="btn-primary-school ms-2">Apply Now</a>
+      </div>
+
+      <button class="d-lg-none btn btn-sm border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu">
+        <i class="bi bi-list" style="font-size:24px;color:var(--maroon-deep)"></i>
+      </button>
+    </div>
+
+    <div class="collapse" id="mobileMenu">
+      <div class="py-3 border-top mt-2">
+        <a href="{{ url_for('public.index') }}" class="d-block py-2 px-3 rounded mb-1 fw-semibold" style="color:var(--maroon)">Home</a>
+        <a href="{{ url_for('public.about') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">About</a>
+        <a href="{{ url_for('public.academics') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">Academics</a>
+        <a href="{{ url_for('public.admissions') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">Admissions</a>
+        <a href="{{ url_for('public.life') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">School Life</a>
+        <a href="{{ url_for('public.news') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">News</a>
+        <a href="{{ url_for('public.events') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">Events</a>
+        <a href="{{ url_for('public.gallery') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">Gallery</a>
+        <a href="{{ url_for('public.contact') }}" class="d-block py-2 px-3 rounded mb-1 text-dark">Contact</a>
+        <a href="{{ url_for('public.admissions') }}" class="btn-primary-school d-block text-center mt-3">Apply Now</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{# ── PAGE CONTENT ─────────────────────────────────────────────── #}
+{% block content %}{% endblock %}
+
+{# ── FOOTER ───────────────────────────────────────────────────── #}
+<footer class="main-footer">
+  <div class="footer-top">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="school-crest school-crest-sm"><span class="crest-inner">M</span></div>
+            <div>
+              <div class="footer-name">{{ settings.get('school_name', 'MPSK') }}</div>
+              <div class="footer-subname">Kabarak · Est. {{ settings.get('founded', '2002') }}</div>
+            </div>
+          </div>
+          <div class="footer-motto">"Education in Biblical Perspective"</div>
+          <p class="footer-desc">{{ settings.get('about_short', 'Moi Primary & Junior School Kabarak nurtures excellence in learners through Christ-centred, competency-based education on the Kabarak University campus.') }}</p>
+          <div class="footer-socials mt-4">
+            {% if settings.get('facebook') %}<a href="{{ settings.facebook }}" target="_blank"><i class="bi bi-facebook"></i></a>{% endif %}
+            {% if settings.get('twitter') %}<a href="{{ settings.twitter }}" target="_blank"><i class="bi bi-twitter-x"></i></a>{% endif %}
+            {% if settings.get('instagram') %}<a href="{{ settings.instagram }}" target="_blank"><i class="bi bi-instagram"></i></a>{% endif %}
+            {% if settings.get('youtube') %}<a href="{{ settings.youtube }}" target="_blank"><i class="bi bi-youtube"></i></a>{% endif %}
+          </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('public.about') }}">About MPSK</a></li>
+            <li><a href="{{ url_for('public.academics') }}">Academics</a></li>
+            <li><a href="{{ url_for('public.admissions') }}">Admissions</a></li>
+            <li><a href="{{ url_for('public.life') }}">School Life</a></li>
+            <li><a href="{{ url_for('public.news') }}">News</a></li>
+            <li><a href="{{ url_for('public.events') }}">Events</a></li>
+            <li><a href="{{ url_for('public.gallery') }}">Gallery</a></li>
+            <li><a href="{{ url_for('public.faq') }}">FAQs</a></li>
+          </ul>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+          <h4 class="footer-heading">Academics</h4>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('public.academics') }}">CBC Strands</a></li>
+            <li><a href="{{ url_for('public.admissions') }}">Requirements</a></li>
+            <li><a href="{{ url_for('public.admissions') }}#fees">Fee Structure</a></li>
+            <li><a href="{{ url_for('public.faq') }}">FAQs</a></li>
+          </ul>
+          <h4 class="footer-heading mt-4">Affiliated</h4>
+          <p style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.6">
+            <a href="https://kabarak.ac.ke" target="_blank" style="color:var(--gold-bright)">Kabarak University</a><br>Nakuru County, Kenya
+          </p>
+        </div>
+
+        <div class="col-lg-4">
+          <h4 class="footer-heading">Contact &amp; Find Us</h4>
+          <ul class="footer-contact-list">
+            <li><i class="bi bi-geo-alt-fill"></i><span>{{ settings.get('address', 'Kabarak, off Nakuru–Eldama Ravine Road, Nakuru County') }}</span></li>
+            <li><i class="bi bi-telephone-fill"></i><span><a href="tel:{{ settings.get('phone','') }}">{{ settings.get('phone', '+254 729 223 370') }}</a></span></li>
+            <li><i class="bi bi-envelope-fill"></i><span><a href="mailto:{{ settings.get('email','') }}">{{ settings.get('email', 'info@mpsk.kabarak.ac.ke') }}</a></span></li>
+            <li><i class="bi bi-clock-fill"></i><span>Mon–Fri: 6:30 AM – 5:00 PM</span></li>
+          </ul>
+          <div class="mt-3">
+            <p class="footer-nl-text">Subscribe to school updates:</p>
+            <div class="d-flex gap-2 footer-nl-form">
+              <input type="email" id="footerNlEmail" placeholder="your@email.com" class="form-control form-control-sm">
+              <button onclick="footerSubscribe()" class="footer-nl-btn">Go</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>© 2025 {{ settings.get('school_name', 'MPSK') }}. All rights reserved.</span>
+        <div class="d-flex gap-3">
+          <a href="{{ url_for('public.privacy') }}">Privacy Policy</a>
+          <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+{# WhatsApp FAB #}
+{% if settings.get('whatsapp') %}
+<a href="https://wa.me/{{ settings.whatsapp }}" class="whatsapp-fab" target="_blank">
+  <i class="bi bi-whatsapp"></i>
+  <span class="fab-tooltip">Chat on WhatsApp</span>
+</a>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+async function footerSubscribe() {
+  const email = document.getElementById('footerNlEmail').value;
+  if (!email) return;
+  try {
+    const res = await fetch('/api/newsletter', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email}) });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) document.getElementById('footerNlEmail').value = '';
+  } catch { alert('Error. Please try again.'); }
+}
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
