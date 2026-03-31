@@ -700,3 +700,38 @@ def save_settings():
     db.settings.update_one({'key': 'site'}, {'$set': data}, upsert=True)
     flash('Settings saved successfully.', 'success')
     return redirect(url_for('admin.settings'))
+
+# ── DATABASE RESET (one-time use) ─────────────────────────────────────────
+@admin_bp.route('/reset-db', methods=['GET', 'POST'])
+@login_required
+def reset_db():
+    """
+    Wipes all collections and re-seeds with clean data (no images).
+    Visit /admin/reset-db once to clear old seeded image URLs from Atlas.
+    Delete this route after use.
+    """
+    if request.method == 'POST':
+        db = get_db()
+        collections = ['settings', 'news', 'events', 'gallery', 'achievements',
+                       'staff', 'testimonials', 'faqs', 'fees', 'cbc_strands']
+        for col in collections:
+            db[col].drop()
+        from utils.db_seed import seed_database
+        seed_database(db)
+        flash('✅ Database reset and re-seeded successfully. No images — upload via admin.', 'success')
+        return redirect(url_for('admin.dashboard'))
+    return '''
+    <html><body style="font-family:sans-serif;max-width:500px;margin:60px auto;padding:20px">
+    <h2>⚠️ Reset Database</h2>
+    <p>This will <strong>wipe all content</strong> (settings, news, staff, gallery, etc.)
+    and re-seed with clean data containing <strong>no images</strong>.</p>
+    <p>Users and passwords are preserved.</p>
+    <form method="POST">
+      <button type="submit" style="background:#c0392b;color:#fff;padding:12px 24px;border:none;border-radius:6px;font-size:16px;cursor:pointer">
+        Yes, Reset Database
+      </button>
+      &nbsp;
+      <a href="/admin/dashboard" style="padding:12px 24px;border:1px solid #ccc;border-radius:6px;text-decoration:none;color:#333">Cancel</a>
+    </form>
+    </body></html>
+    '''
