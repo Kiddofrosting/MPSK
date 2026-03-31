@@ -162,21 +162,9 @@ async function saveImg(btn) {
 
     if (d.success) {
       delete pendingFiles[key];
-      setStatus(key, '✓ Saved successfully!', 'success');
-
-      // Update preview with returned URL (works for both data: and https:)
-      const wrap = document.getElementById('preview-' + key);
-      const badge = d.url.startsWith('http') ? 'url' : 'saved';
-      wrap.innerHTML = '<img src="' + d.url + '" style="width:100%;height:100%;object-fit:cover"'
-                     + ' onerror="this.parentElement.innerHTML=\'<span class=\\\'no-img\\\'><i class=\\\'bi bi-broken-image\\\'></i></span>\'">'
-                     + '<span class="img-badge">' + badge + '</span>';
-
-      // Update hint
-      const hint = document.getElementById('hint-' + key);
-      if (hint) hint.innerHTML = '<i class="bi bi-check-circle me-1"></i>Image saved';
-
-      // Clear URL input after save
-      if (urlInput) urlInput.value = '';
+      setStatus(key, '✓ Saved! Refreshing preview…', 'success');
+      // Reload page after short delay so preview shows saved image from DB
+      setTimeout(() => { window.location.reload(); }, 800);
     } else {
       setStatus(key, d.message || 'Save failed.', 'error');
     }

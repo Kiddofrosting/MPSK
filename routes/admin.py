@@ -636,15 +636,33 @@ def save_image():
     image_file = request.files.get('image_file')
     image_url  = request.form.get('image_url', '').strip()
 
+    # ── DEBUG: log what we received ───────────────────────────────────────
+    file_name = image_file.filename if image_file else None
+    file_size = 0
+    if image_file and image_file.filename:
+        data = image_file.read()
+        file_size = len(data)
+        image_file.seek(0)  # reset after reading
+
+    debug = {
+        'field_key': field_key,
+        'has_file': bool(image_file and image_file.filename),
+        'file_name': file_name,
+        'file_size': file_size,
+        'has_url': bool(image_url),
+        'url_preview': image_url[:60] if image_url else None,
+    }
+    print(f"[save_image] {debug}", flush=True)
+
     raw = db.settings.find_one({'key': 'site'}) or {}
     existing = raw.get(field_key, '')
 
     final_val = resolve_image_url(image_file, image_url, existing)
     if not final_val:
-        return jsonify({'success': False, 'message': 'No image provided.'})
+        return jsonify({'success': False, 'message': 'No image provided.', 'debug': debug})
 
     db.settings.update_one({'key': 'site'}, {'$set': {field_key: final_val}}, upsert=True)
-    return jsonify({'success': True, 'message': 'Image updated.', 'url': final_val})
+    return jsonify({'success': True, 'message': 'Image updated.', 'url': final_val, 'debug': debug})
 
 @admin_bp.route('/images/clear', methods=['POST'])
 @login_required
@@ -735,3 +753,39 @@ def reset_db():
     </form>
     </body></html>
     '''
+
+
+# ── IMAGE UPLOAD TEST ──────────────────────────────────────────────────────
+@admin_bp.route('/images/test', methods=['GET', 'POST'])
+@login_required
+def image_test():
+    """Simple test page to verify image upload pipeline works end-to-end."""
+    result = None
+    if request.method == 'POST':
+        image_file = request.files.get('image_file')
+        image_url  = request.form.get('image_url', '').strip()
+        file_info = {
+            'filename': image_file.filename if image_file else None,
+            'content_type': image_file.content_type if image_file else None,
+        }
+        data_url = None
+        if image_file and image_file.filename:
+            data_url = file_to_data_url(image_file)
+        result = {
+            'file_info': file_info,
+            'data_url_length': len(data_url) if data_url else 0,
+            'data_url_preview': data_url[:60] if data_url else None,
+            'url_input': image_url,
+        }
+    return f"""
+    <html><body style="font-family:sans-serif;max-width:600px;margin:40px auto;padding:20px">
+    <h2>🧪 Image Upload Test</h2>
+    <form method="POST" enctype="multipart/form-data">
+      <p><input type="file" name="image_file" accept="image/*"></p>
+      <p>Or URL: <input type="url" name="image_url" style="width:400px"></p>
+      <button type="submit" style="padding:8px 20px;background:#6B1E2E;color:#fff;border:none;border-radius:6px;cursor:pointer">Test Upload</button>
+    </form>
+    {'<pre style="background:#f0f0f0;padding:12px;border-radius:6px">' + str(result) + '</pre>' if result else ''}
+    <p><a href="/admin/images">← Back to Image Manager</a></p>
+    </body></html>
+    """

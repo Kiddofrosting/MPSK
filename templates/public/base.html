@@ -111,7 +111,7 @@
         <a href="{{ url_for('public.index') }}" class="nav-link {% if request.endpoint == 'public.index' %}active{% endif %}">Home</a>
         <a href="{{ url_for('public.about') }}" class="nav-link {% if request.endpoint == 'public.about' %}active{% endif %}">About</a>
         <div class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle {% if request.endpoint in ['public.academics','public.admissions'] %}active{% endif %}" data-bs-toggle="dropdown">Academics</a>
+          <a href="#" class="nav-link dropdown-toggle {% if request.endpoint and request.endpoint in ['public.academics','public.admissions'] %}active{% endif %}" data-bs-toggle="dropdown">Academics</a>
           <ul class="dropdown-menu">
             <li><a href="{{ url_for('public.academics') }}" class="dropdown-item"><i class="bi bi-journal-bookmark me-2 text-muted"></i>CBC Curriculum</a></li>
             <li><a href="{{ url_for('public.admissions') }}" class="dropdown-item"><i class="bi bi-person-plus me-2 text-muted"></i>Admissions</a></li>
@@ -120,7 +120,7 @@
           </ul>
         </div>
         <a href="{{ url_for('public.life') }}" class="nav-link {% if request.endpoint == 'public.life' %}active{% endif %}">School Life</a>
-        <a href="{{ url_for('public.news') }}" class="nav-link {% if 'news' in request.endpoint %}active{% endif %}">News</a>
+        <a href="{{ url_for('public.news') }}" class="nav-link {% if request.endpoint and 'news' in request.endpoint %}active{% endif %}">News</a>
         <a href="{{ url_for('public.events') }}" class="nav-link {% if request.endpoint == 'public.events' %}active{% endif %}">Events</a>
         <a href="{{ url_for('public.gallery') }}" class="nav-link {% if request.endpoint == 'public.gallery' %}active{% endif %}">Gallery</a>
         <a href="{{ url_for('public.contact') }}" class="nav-link {% if request.endpoint == 'public.contact' %}active{% endif %}">Contact</a>
