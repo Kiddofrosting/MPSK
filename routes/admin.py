@@ -36,33 +36,45 @@ SITE_IMAGE_FIELDS = [
 ]
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_IMAGE_SIZE = 4 * 1024 * 1024  # 4MB limit for base64 storage
 
 # get_db imported from db.py
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def upload_file(file):
-    if file and allowed_file(file.filename):
-        ext = file.filename.rsplit('.', 1)[1].lower()
-        filename = f"{uuid.uuid4().hex}.{ext}"
-        upload_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads', filename)
-        file.save(upload_path)
-        return filename
-    return None
-
-def resolve_image(file_obj, url_str, existing_file='', existing_url=''):
+def file_to_data_url(file):
     """
-    Returns (file_filename, url) tuple.
-    Priority: new file upload > url field > keep existing.
+    Convert an uploaded file to a base64 data URL.
+    Stored directly in MongoDB — no filesystem required.
+    Works on Render and any ephemeral hosting.
+    """
+    import base64, imghdr
+    if not file or not file.filename:
+        return None
+    if not allowed_file(file.filename):
+        return None
+    data = file.read()
+    if len(data) > MAX_IMAGE_SIZE:
+        return None  # Too large
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    mime = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+            'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp'}.get(ext, 'image/jpeg')
+    b64 = base64.b64encode(data).decode('utf-8')
+    return f"data:{mime};base64,{b64}"
+
+def resolve_image_url(file_obj, url_str, existing=''):
+    """
+    Returns a single image URL string.
+    Priority: new file upload (→ data URL) > new URL > keep existing.
     """
     if file_obj and file_obj.filename:
-        saved = upload_file(file_obj)
-        if saved:
-            return saved, ''
+        data_url = file_to_data_url(file_obj)
+        if data_url:
+            return data_url
     if url_str and url_str.strip():
-        return '', url_str.strip()
-    return existing_file, existing_url
+        return url_str.strip()
+    return existing
 
 def slugify(text):
     text = text.lower().strip()
@@ -145,7 +157,9 @@ def news_form(article_id=None):
     if request.method == 'POST':
         title = request.form.get('title', '').strip()
         image_file = request.files.get('image')
-        image = upload_file(image_file) if image_file and image_file.filename else (article.get('image', '') if article else '')
+        image_url_input = request.form.get('image_url', '').strip()
+        existing_img = article.get('image_url', '') if article else ''
+        final_image = resolve_image_url(image_file, image_url_input, existing_img)
 
         data = {
             'title': title,
@@ -154,7 +168,8 @@ def news_form(article_id=None):
             'content': request.form.get('content', '').strip(),
             'category': request.form.get('category', 'News'),
             'author': request.form.get('author', '').strip(),
-            'image': image,
+            'image': '',
+            'image_url': final_image,
             'published': request.form.get('published') in ('on', 'true', '1'),
             'featured': request.form.get('featured') in ('on', 'true', '1'),
             'date': datetime.utcnow(),
@@ -239,13 +254,13 @@ def gallery_upload():
         count = 1
     else:
         for f in files:
-            filename = upload_file(f)
-            if filename:
+            data_url = file_to_data_url(f)
+            if data_url:
                 db.gallery.insert_one({
                     'title': title or f.filename,
                     'category': category,
-                    'image': filename,
-                    'image_url': image_url,
+                    'image': '',
+                    'image_url': data_url,
                     'description': request.form.get('description', ''),
                     'date': datetime.utcnow(),
                     'featured': featured
@@ -314,18 +329,16 @@ def save_staff():
     photo_file = request.files.get('photo')
     photo_url_input = request.form.get('photo_url', '').strip()
     existing = db.staff.find_one({'_id': ObjectId(staff_id)}) if staff_id else {}
-
-    ex_file = existing.get('photo', '') if existing else ''
-    ex_url  = existing.get('photo_url', '') if existing else ''
-    saved_file, saved_url = resolve_image(photo_file, photo_url_input, ex_file, ex_url)
+    ex_img = existing.get('photo_url', '') if existing else ''
+    final_photo = resolve_image_url(photo_file, photo_url_input, ex_img)
 
     data = {
         'name': request.form.get('name', '').strip(),
         'role': request.form.get('role', '').strip(),
         'qualifications': request.form.get('qualifications', '').strip(),
         'bio': request.form.get('bio', '').strip(),
-        'photo': saved_file,
-        'photo_url': saved_url,
+        'photo': '',
+        'photo_url': final_photo,
         'featured': request.form.get('featured') in ('true', 'on', '1'),
         'order': int(request.form.get('order') or 99),
     }
@@ -361,9 +374,8 @@ def save_testimonial():
     photo_file = request.files.get('photo')
     photo_url_input = request.form.get('photo_url', '').strip()
     existing = db.testimonials.find_one({'_id': ObjectId(tid)}) if tid else {}
-    ex_file = existing.get('photo', '') if existing else ''
-    ex_url  = existing.get('photo_url', '') if existing else ''
-    saved_file, saved_url = resolve_image(photo_file, photo_url_input, ex_file, ex_url)
+    ex_img = existing.get('photo_url', '') if existing else ''
+    final_photo = resolve_image_url(photo_file, photo_url_input, ex_img)
 
     data = {
         'name': request.form.get('name', '').strip(),
@@ -372,8 +384,8 @@ def save_testimonial():
         'rating': int(request.form.get('rating') or 5),
         'active': published_val in ('true', 'on', '1'),
         'order': int(request.form.get('order') or 99),
-        'photo': saved_file,
-        'photo_url': saved_url,
+        'photo': '',
+        'photo_url': final_photo,
     }
     if tid:
         db.testimonials.update_one({'_id': ObjectId(tid)}, {'$set': data})
@@ -625,21 +637,10 @@ def save_image():
     image_url  = request.form.get('image_url', '').strip()
 
     raw = db.settings.find_one({'key': 'site'}) or {}
-    existing_file = raw.get(field_key + '_file', '')
-    existing_url  = raw.get(field_key, '')
+    existing = raw.get(field_key, '')
 
-    # If the existing value is a static upload path, treat it as file
-    if existing_url.startswith('/static/uploads/'):
-        existing_file = existing_url.replace('/static/uploads/', '')
-        existing_url = ''
-
-    saved_file, saved_url = resolve_image(image_file, image_url, existing_file, existing_url)
-
-    if saved_file:
-        final_val = '/static/uploads/' + saved_file
-    elif saved_url:
-        final_val = saved_url
-    else:
+    final_val = resolve_image_url(image_file, image_url, existing)
+    if not final_val:
         return jsonify({'success': False, 'message': 'No image provided.'})
 
     db.settings.update_one({'key': 'site'}, {'$set': {field_key: final_val}}, upsert=True)
@@ -681,14 +682,9 @@ def save_settings():
         f = request.files.get(img_key + '_file')
         url = request.form.get(img_key, '').strip()
         existing = raw.get(img_key, '')
-        existing_file = existing.replace('/static/uploads/', '') if existing.startswith('/static/uploads/') else ''
-        saved_file, saved_url = resolve_image(f, url, existing_file, existing if not existing_file else '')
-        if saved_file:
-            data[img_key] = '/static/uploads/' + saved_file
-        elif saved_url:
-            data[img_key] = saved_url
-        elif existing:
-            data[img_key] = existing  # keep existing
+        result = resolve_image_url(f, url, existing)
+        if result:
+            data[img_key] = result
 
     # Handle password change
     new_pw = request.form.get('new_password', '').strip()
