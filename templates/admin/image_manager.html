@@ -5,8 +5,7 @@
 {% block extra_css %}
 <style>
 .img-section-header{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--maroon-deep);font-weight:700;margin:28px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--maroon-light);display:flex;align-items:center;gap:10px;text-transform:capitalize}
-.img-section-header i{color:var(--maroon)}
-.img-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:18px;align-items:flex-start;transition:box-shadow .2s;position:relative}
+.img-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:18px;align-items:flex-start;transition:box-shadow .2s}
 .img-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.09)}
 .img-preview-wrap{width:110px;height:80px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--maroon-light);display:flex;align-items:center;justify-content:center;border:2px solid var(--border);position:relative}
 .img-preview-wrap img{width:100%;height:100%;object-fit:cover}
@@ -28,14 +27,13 @@
 .img-status{font-size:11px;padding:3px 10px;border-radius:6px;display:none;margin-top:6px}
 .img-status.success{background:#d1fae5;color:#065f46;display:inline-block}
 .img-status.error{background:#fee2e2;color:#991b1b;display:inline-block}
-.section-icon-hero::before{content:'🖼️ '}.section-icon-about::before{content:'👤 '}.section-icon-academics::before{content:'📚 '}.section-icon-admissions::before{content:'📋 '}.section-icon-life::before{content:'🏫 '}.section-icon-contact::before{content:'📍 '}.section-icon-branding::before{content:'🎨 '}
 .upload-hint{font-size:11px;color:#aaa;margin-top:4px}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-2">
-  <p style="color:var(--text-muted);margin:0">Upload files or set image URLs for every visual on the website. Changes apply immediately.</p>
+  <p style="color:var(--text-muted);margin:0">Upload files or paste image URLs. Changes apply immediately.</p>
   <a href="{{ url_for('admin.settings') }}" class="tbl-btn tbl-btn-edit"><i class="bi bi-gear me-1"></i>Full Settings</a>
 </div>
 
@@ -52,22 +50,23 @@
 } %}
 
 {% for sec_name, fields in sections.items() %}
-<div class="img-section-header section-icon-{{ sec_name }}">
+<div class="img-section-header">
   <i class="bi {{ section_icons.get(sec_name, 'bi-image') }}"></i>
   {{ sec_name|title }} Images
   <span style="font-size:11px;font-weight:400;color:#bbb;font-family:sans-serif;text-transform:none;margin-left:4px">({{ fields|length }} image{{ 's' if fields|length != 1 }})</span>
 </div>
 <div class="row g-3 mb-2">
 {% for field in fields %}
-  {% set val = field.value %}
-  {% set is_upload = val and val.startswith('/static/uploads/') %}
-  {% set is_url = val and not val.startswith('/static/uploads/') %}
+  {# Determine if there's a current image. Don't put base64 in value attr — too large #}
+  {% set has_val = field.value and field.value|length > 0 %}
+  {% set is_ext_url = has_val and (field.value.startswith('http://') or field.value.startswith('https://')) %}
 <div class="col-lg-6">
   <div class="img-card" id="imgcard-{{ field.key }}">
     <div class="img-preview-wrap" id="preview-{{ field.key }}">
-      {% if val %}
-        <img src="{{ val }}" alt="{{ field.label }}" onerror="this.parentElement.innerHTML='<span class=no-img><i class=bi bi-broken-image></i></span>'">
-        <span class="img-badge">{% if is_upload %}uploaded{% else %}url{% endif %}</span>
+      {% if has_val %}
+        <img src="{{ field.value }}" alt="{{ field.label }}"
+             onerror="this.parentElement.innerHTML='<span class=\'no-img\'><i class=\'bi bi-broken-image\'></i></span>'">
+        <span class="img-badge">{% if is_ext_url %}url{% else %}saved{% endif %}</span>
       {% else %}
         <span class="no-img"><i class="bi bi-image"></i></span>
       {% endif %}
@@ -78,26 +77,32 @@
       <div class="img-input-group">
         <label class="img-file-btn" title="Upload from device">
           <i class="bi bi-upload me-1"></i>Upload
-          <input type="file" accept="image/*" style="display:none" onchange="handleImgFile(this,'{{ field.key }}')">
+          <input type="file" accept="image/*" style="display:none"
+                 data-key="{{ field.key }}"
+                 onchange="handleImgFile(this)">
         </label>
         <span class="img-or">or</span>
+        {# Only pre-fill URL input for external http URLs, NOT base64 strings #}
         <input type="url" class="img-url-input" id="url-{{ field.key }}"
                placeholder="https://example.com/photo.jpg"
-               value="{{ val if is_url else '' }}">
-        <button class="img-save-btn" onclick="saveImg('{{ field.key }}')">
+               value="{{ field.value if is_ext_url else '' }}">
+        <button class="img-save-btn" data-key="{{ field.key }}" onclick="saveImg(this)">
           <i class="bi bi-check-lg me-1"></i>Save
         </button>
-        {% if val %}
-        <button class="img-clear-btn" onclick="clearImg('{{ field.key }}')" title="Remove image">
+        {% if has_val %}
+        <button class="img-clear-btn" data-key="{{ field.key }}" onclick="clearImg(this)" title="Remove image">
           <i class="bi bi-x-lg"></i>
         </button>
         {% endif %}
       </div>
       <div id="status-{{ field.key }}" class="img-status"></div>
-      {% if is_upload %}
-        <div class="upload-hint"><i class="bi bi-paperclip me-1"></i>Currently using uploaded file</div>
-      {% elif is_url %}
-        <div class="upload-hint"><i class="bi bi-link-45deg me-1"></i>Currently using URL</div>
+      {% if has_val %}
+        <div class="upload-hint" id="hint-{{ field.key }}">
+          <i class="bi bi-{% if is_ext_url %}link-45deg{% else %}check-circle{% endif %} me-1"></i>
+          {% if is_ext_url %}Using external URL{% else %}Image saved{% endif %}
+        </div>
+      {% else %}
+        <div class="upload-hint" id="hint-{{ field.key }}">No image set</div>
       {% endif %}
     </div>
   </div>
@@ -107,74 +112,113 @@
 {% endfor %}
 
 <script>
+// pendingFiles stores File objects keyed by field key
 const pendingFiles = {};
 
-function handleImgFile(input, key) {
+function handleImgFile(input) {
+  const key = input.dataset.key;
   const file = input.files[0];
   if (!file) return;
   pendingFiles[key] = file;
+
+  // Show preview immediately using FileReader
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = function(e) {
     const wrap = document.getElementById('preview-' + key);
-    wrap.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">
-                      <span class="img-badge">new upload</span>`;
+    wrap.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">'
+                   + '<span class="img-badge">new</span>';
   };
   reader.readAsDataURL(file);
-  setStatus(key, 'File selected — click Save to apply.', 'success');
+  setStatus(key, 'File ready — click Save to upload.', 'success');
 }
 
-async function saveImg(key) {
+async function saveImg(btn) {
+  const key = btn.dataset.key;
   const urlInput = document.getElementById('url-' + key);
+  const urlVal = urlInput ? urlInput.value.trim() : '';
+  const hasFile = !!pendingFiles[key];
+  const hasUrl = urlVal.length > 0 && urlVal.startsWith('http');
+
+  if (!hasFile && !hasUrl) {
+    setStatus(key, 'Upload a file or enter a URL first.', 'error');
+    return;
+  }
+
+  btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Saving…';
+  btn.disabled = true;
+
   const fd = new FormData();
   fd.append('field_key', key);
-  if (pendingFiles[key]) {
+
+  if (hasFile) {
     fd.append('image_file', pendingFiles[key]);
   } else {
-    fd.append('image_url', urlInput.value.trim());
+    fd.append('image_url', urlVal);
   }
-  if (!pendingFiles[key] && !urlInput.value.trim()) {
-    setStatus(key, 'Enter a URL or upload a file first.', 'error'); return;
-  }
-  const btn = event.currentTarget;
-  btn.textContent = 'Saving…'; btn.disabled = true;
+
   try {
-    const r = await fetch('{{ url_for("admin.save_image") }}', {method:'POST', body: fd});
+    const r = await fetch('{{ url_for("admin.save_image") }}', { method: 'POST', body: fd });
     const d = await r.json();
+
     if (d.success) {
       delete pendingFiles[key];
-      setStatus(key, '✓ Saved!', 'success');
-      // Update preview
+      setStatus(key, '✓ Saved successfully!', 'success');
+
+      // Update preview with returned URL (works for both data: and https:)
       const wrap = document.getElementById('preview-' + key);
-      wrap.innerHTML = `<img src="${d.url}" style="width:100%;height:100%;object-fit:cover"
-        onerror="this.parentElement.innerHTML='<span class=no-img><i class=bi.bi-broken-image></i></span>'">
-        <span class="img-badge">${d.url.includes('/static/uploads/') ? 'uploaded' : 'url'}</span>`;
+      const badge = d.url.startsWith('http') ? 'url' : 'saved';
+      wrap.innerHTML = '<img src="' + d.url + '" style="width:100%;height:100%;object-fit:cover"'
+                     + ' onerror="this.parentElement.innerHTML=\'<span class=\\\'no-img\\\'><i class=\\\'bi bi-broken-image\\\'></i></span>\'">'
+                     + '<span class="img-badge">' + badge + '</span>';
+
+      // Update hint
+      const hint = document.getElementById('hint-' + key);
+      if (hint) hint.innerHTML = '<i class="bi bi-check-circle me-1"></i>Image saved';
+
+      // Clear URL input after save
+      if (urlInput) urlInput.value = '';
     } else {
-      setStatus(key, d.message || 'Error saving.', 'error');
+      setStatus(key, d.message || 'Save failed.', 'error');
     }
   } catch(e) {
-    setStatus(key, 'Network error.', 'error');
+    setStatus(key, 'Network error — try again.', 'error');
   }
-  btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Save'; btn.disabled = false;
+
+  btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Save';
+  btn.disabled = false;
 }
 
-async function clearImg(key) {
+async function clearImg(btn) {
+  const key = btn.dataset.key;
   if (!confirm('Remove this image?')) return;
+
   const fd = new FormData();
   fd.append('field_key', key);
-  const r = await fetch('{{ url_for("admin.clear_image") }}', {method:'POST', body: fd});
-  const d = await r.json();
-  if (d.success) {
-    document.getElementById('preview-' + key).innerHTML = '<span class="no-img"><i class="bi bi-image"></i></span>';
-    document.getElementById('url-' + key).value = '';
-    setStatus(key, 'Image cleared.', 'success');
+
+  try {
+    const r = await fetch('{{ url_for("admin.clear_image") }}', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('preview-' + key).innerHTML =
+        '<span class="no-img"><i class="bi bi-image"></i></span>';
+      const urlInput = document.getElementById('url-' + key);
+      if (urlInput) urlInput.value = '';
+      delete pendingFiles[key];
+      const hint = document.getElementById('hint-' + key);
+      if (hint) hint.innerHTML = 'No image set';
+      setStatus(key, 'Image cleared.', 'success');
+    }
+  } catch(e) {
+    setStatus(key, 'Error clearing image.', 'error');
   }
 }
 
 function setStatus(key, msg, type) {
   const el = document.getElementById('status-' + key);
+  if (!el) return;
   el.textContent = msg;
   el.className = 'img-status ' + type;
-  setTimeout(() => { el.style.display = 'none'; el.className = 'img-status'; }, 3000);
+  setTimeout(() => { el.style.display = 'none'; el.className = 'img-status'; }, 4000);
 }
 </script>
 {% endblock %}
