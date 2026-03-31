@@ -35,46 +35,69 @@ SITE_IMAGE_FIELDS = [
     ('branding','og_image',             'Social Share Image (OG)',            'Preview image for social media links'),
 ]
 
+# ── Image helpers ─────────────────────────────────────────────────────────
+import base64 as _base64
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-MAX_IMAGE_SIZE = 4 * 1024 * 1024  # 4MB limit for base64 storage
+MAX_IMAGE_BYTES    = 4 * 1024 * 1024  # 4 MB hard limit
+MIME_MAP = {
+    'jpg':  'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png':  'image/png',
+    'gif':  'image/gif',
+    'webp': 'image/webp',
+}
 
 # get_db imported from db.py
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def _allowed(filename):
+    """Return True if filename has an allowed image extension."""
+    if not filename or '.' not in filename:
+        return False
+    return filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def file_to_data_url(file):
+def file_to_data_url(file_storage):
     """
-    Convert an uploaded file to a base64 data URL.
-    Stored directly in MongoDB — no filesystem required.
-    Works on Render and any ephemeral hosting.
+    Read a Werkzeug FileStorage object and return a base64 data URL string,
+    or None on any error. Stores image directly in MongoDB — no disk needed.
     """
-    import base64, imghdr
-    if not file or not file.filename:
+    if not file_storage or not file_storage.filename:
         return None
-    if not allowed_file(file.filename):
+    if not _allowed(file_storage.filename):
         return None
-    data = file.read()
-    if len(data) > MAX_IMAGE_SIZE:
-        return None  # Too large
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    mime = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
-            'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp'}.get(ext, 'image/jpeg')
-    b64 = base64.b64encode(data).decode('utf-8')
-    return f"data:{mime};base64,{b64}"
+    try:
+        file_storage.seek(0)          # always start from beginning
+        data = file_storage.read()
+        if not data:
+            return None
+        if len(data) > MAX_IMAGE_BYTES:
+            return None               # silently reject oversized files
+        ext  = file_storage.filename.rsplit('.', 1)[1].lower()
+        mime = MIME_MAP.get(ext, 'image/jpeg')
+        b64  = _base64.b64encode(data).decode('utf-8')
+        return f"data:{mime};base64,{b64}"
+    except Exception:
+        return None
 
-def resolve_image_url(file_obj, url_str, existing=''):
+def resolve_image(file_storage, url_str, existing=''):
     """
-    Returns a single image URL string.
-    Priority: new file upload (→ data URL) > new URL > keep existing.
+    Return the best available image value:
+      1. Uploaded file  → base64 data URL
+      2. URL string     → as-is (must start with http)
+      3. existing value → unchanged
+      4. ''             → nothing
     """
-    if file_obj and file_obj.filename:
-        data_url = file_to_data_url(file_obj)
-        if data_url:
-            return data_url
-    if url_str and url_str.strip():
-        return url_str.strip()
-    return existing
+    # Priority 1: file upload
+    if file_storage and getattr(file_storage, 'filename', None):
+        result = file_to_data_url(file_storage)
+        if result:
+            return result
+    # Priority 2: explicit URL
+    url = (url_str or '').strip()
+    if url and url.startswith('http'):
+        return url
+    # Priority 3: keep existing
+    return existing or ''
 
 def slugify(text):
     text = text.lower().strip()
@@ -159,7 +182,7 @@ def news_form(article_id=None):
         image_file = request.files.get('image')
         image_url_input = request.form.get('image_url', '').strip()
         existing_img = article.get('image_url', '') if article else ''
-        final_image = resolve_image_url(image_file, image_url_input, existing_img)
+        final_image = resolve_image(image_file, image_url_input, existing_img)
 
         data = {
             'title': title,
@@ -330,7 +353,7 @@ def save_staff():
     photo_url_input = request.form.get('photo_url', '').strip()
     existing = db.staff.find_one({'_id': ObjectId(staff_id)}) if staff_id else {}
     ex_img = existing.get('photo_url', '') if existing else ''
-    final_photo = resolve_image_url(photo_file, photo_url_input, ex_img)
+    final_photo = resolve_image(photo_file, photo_url_input, ex_img)
 
     data = {
         'name': request.form.get('name', '').strip(),
@@ -375,7 +398,7 @@ def save_testimonial():
     photo_url_input = request.form.get('photo_url', '').strip()
     existing = db.testimonials.find_one({'_id': ObjectId(tid)}) if tid else {}
     ex_img = existing.get('photo_url', '') if existing else ''
-    final_photo = resolve_image_url(photo_file, photo_url_input, ex_img)
+    final_photo = resolve_image(photo_file, photo_url_input, ex_img)
 
     data = {
         'name': request.form.get('name', '').strip(),
@@ -627,7 +650,7 @@ def image_manager():
 @admin_bp.route('/images/save', methods=['POST'])
 @login_required
 def save_image():
-    """Save a single site image — either an uploaded file or a URL."""
+    """Save a single site image (file upload or URL) to MongoDB settings."""
     db = get_db()
     field_key = request.form.get('field_key', '').strip()
     if not field_key:
@@ -636,33 +659,23 @@ def save_image():
     image_file = request.files.get('image_file')
     image_url  = request.form.get('image_url', '').strip()
 
-    # ── DEBUG: log what we received ───────────────────────────────────────
-    file_name = image_file.filename if image_file else None
-    file_size = 0
-    if image_file and image_file.filename:
-        data = image_file.read()
-        file_size = len(data)
-        image_file.seek(0)  # reset after reading
-
-    debug = {
-        'field_key': field_key,
-        'has_file': bool(image_file and image_file.filename),
-        'file_name': file_name,
-        'file_size': file_size,
-        'has_url': bool(image_url),
-        'url_preview': image_url[:60] if image_url else None,
-    }
-    print(f"[save_image] {debug}", flush=True)
-
-    raw = db.settings.find_one({'key': 'site'}) or {}
+    raw      = db.settings.find_one({'key': 'site'}) or {}
     existing = raw.get(field_key, '')
 
-    final_val = resolve_image_url(image_file, image_url, existing)
+    final_val = resolve_image(image_file, image_url, existing)
+
     if not final_val:
-        return jsonify({'success': False, 'message': 'No image provided.', 'debug': debug})
+        return jsonify({'success': False, 'message': 'Please upload a file or enter a URL.'})
+
+    if final_val == existing:
+        return jsonify({'success': False, 'message': 'No new image provided — nothing changed.'})
 
     db.settings.update_one({'key': 'site'}, {'$set': {field_key: final_val}}, upsert=True)
-    return jsonify({'success': True, 'message': 'Image updated.', 'url': final_val, 'debug': debug})
+
+    # Return a short preview so JS can confirm save without sending the full base64 back
+    is_data_url = final_val.startswith('data:')
+    preview     = final_val[:40] + '...' if is_data_url else final_val
+    return jsonify({'success': True, 'message': 'Image saved.', 'preview': preview, 'is_data_url': is_data_url})
 
 @admin_bp.route('/images/clear', methods=['POST'])
 @login_required
@@ -700,7 +713,7 @@ def save_settings():
         f = request.files.get(img_key + '_file')
         url = request.form.get(img_key, '').strip()
         existing = raw.get(img_key, '')
-        result = resolve_image_url(f, url, existing)
+        result = resolve_image(f, url, existing)
         if result:
             data[img_key] = result
 

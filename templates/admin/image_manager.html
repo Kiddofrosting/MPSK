@@ -4,209 +4,249 @@
 
 {% block extra_css %}
 <style>
-.img-section-header{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--maroon-deep);font-weight:700;margin:28px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--maroon-light);display:flex;align-items:center;gap:10px;text-transform:capitalize}
-.img-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:18px;align-items:flex-start;transition:box-shadow .2s}
-.img-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.09)}
-.img-preview-wrap{width:110px;height:80px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--maroon-light);display:flex;align-items:center;justify-content:center;border:2px solid var(--border);position:relative}
-.img-preview-wrap img{width:100%;height:100%;object-fit:cover}
-.img-preview-wrap .no-img{font-size:2rem;color:var(--maroon);opacity:.35}
-.img-preview-wrap .img-badge{position:absolute;bottom:4px;left:4px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.6);color:#fff;letter-spacing:.5px;text-transform:uppercase}
-.img-meta{flex:1;min-width:0}
-.img-meta h6{font-weight:700;color:var(--maroon-deep);margin-bottom:3px;font-size:14px}
-.img-meta p{font-size:12px;color:#999;margin-bottom:10px}
-.img-input-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.img-file-btn{background:var(--maroon-light);color:var(--maroon);border:1.5px dashed var(--maroon);border-radius:8px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
-.img-file-btn:hover{background:var(--maroon);color:#fff}
-.img-or{font-size:11px;color:#bbb;font-weight:600;flex-shrink:0}
-.img-url-input{flex:1;min-width:160px;font-size:13px;padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;transition:border-color .2s}
-.img-url-input:focus{border-color:var(--maroon)}
-.img-save-btn{background:var(--maroon);color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap}
-.img-save-btn:hover{background:var(--maroon-deep)}
-.img-clear-btn{background:transparent;border:1.5px solid #e5e7eb;color:#bbb;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;transition:all .2s}
-.img-clear-btn:hover{border-color:#ef4444;color:#ef4444}
-.img-status{font-size:11px;padding:3px 10px;border-radius:6px;display:none;margin-top:6px}
-.img-status.success{background:#d1fae5;color:#065f46;display:inline-block}
-.img-status.error{background:#fee2e2;color:#991b1b;display:inline-block}
-.upload-hint{font-size:11px;color:#aaa;margin-top:4px}
+.im-section { margin-bottom: 2rem; }
+.im-section-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
+  color:var(--maroon-deep); border-bottom:2px solid var(--maroon-light);
+  padding-bottom:8px; margin-bottom:1rem; display:flex; align-items:center; gap:8px; }
+.im-card { background:#fff; border:1px solid var(--border); border-radius:12px;
+  padding:16px; display:flex; gap:16px; align-items:flex-start; margin-bottom:12px; }
+.im-thumb { width:100px; height:72px; border-radius:8px; overflow:hidden; flex-shrink:0;
+  background:#f3e8ec; border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center; }
+.im-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.im-thumb .empty { font-size:1.6rem; color:var(--maroon); opacity:.3; }
+.im-body { flex:1; min-width:0; }
+.im-body h6 { font-weight:700; color:var(--maroon-deep); font-size:13.5px; margin-bottom:2px; }
+.im-body p  { font-size:11.5px; color:#999; margin-bottom:10px; }
+.im-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.im-upload-btn { background:var(--maroon-light); color:var(--maroon);
+  border:1.5px dashed var(--maroon); border-radius:7px; padding:6px 14px;
+  font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;
+  transition:all .2s; }
+.im-upload-btn:hover { background:var(--maroon); color:#fff; }
+.im-url { flex:1; min-width:140px; font-size:12.5px; padding:6px 10px;
+  border:1.5px solid var(--border); border-radius:7px; outline:none; }
+.im-url:focus { border-color:var(--maroon); }
+.im-save { background:var(--maroon); color:#fff; border:none; border-radius:7px;
+  padding:6px 18px; font-size:12.5px; font-weight:600; cursor:pointer;
+  white-space:nowrap; transition:background .2s; }
+.im-save:hover { background:var(--maroon-deep); }
+.im-save:disabled { opacity:.6; cursor:not-allowed; }
+.im-clear { background:transparent; border:1.5px solid #e5e7eb; color:#ccc;
+  border-radius:7px; padding:6px 10px; font-size:12px; cursor:pointer; }
+.im-clear:hover { border-color:#ef4444; color:#ef4444; }
+.im-msg { font-size:11px; margin-top:6px; padding:3px 10px; border-radius:5px;
+  display:none; }
+.im-msg.ok  { background:#d1fae5; color:#065f46; display:inline-block; }
+.im-msg.err { background:#fee2e2; color:#991b1b; display:inline-block; }
+.im-tag { font-size:9px; font-weight:700; background:rgba(0,0,0,.55); color:#fff;
+  padding:2px 5px; border-radius:3px; margin-left:4px; vertical-align:middle; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-2">
-  <p style="color:var(--text-muted);margin:0">Upload files or paste image URLs. Changes apply immediately.</p>
-  <a href="{{ url_for('admin.settings') }}" class="tbl-btn tbl-btn-edit"><i class="bi bi-gear me-1"></i>Full Settings</a>
-</div>
+<p style="color:var(--text-muted);margin-bottom:1.5rem">
+  Upload an image file (max 4 MB) or paste an external URL for each slot.
+  Images are saved to the database and survive redeployments.
+</p>
 
-<div id="imgManagerAlerts"></div>
+{% set icons = {'hero':'bi-layers','about':'bi-person-circle','academics':'bi-journal-bookmark',
+  'admissions':'bi-clipboard-check','life':'bi-building','contact':'bi-geo-alt','branding':'bi-palette'} %}
 
-{% set section_icons = {
-  'hero': 'bi-layers',
-  'about': 'bi-person-circle',
-  'academics': 'bi-journal-bookmark',
-  'admissions': 'bi-clipboard-check',
-  'life': 'bi-building',
-  'contact': 'bi-geo-alt',
-  'branding': 'bi-palette'
-} %}
-
-{% for sec_name, fields in sections.items() %}
-<div class="img-section-header">
-  <i class="bi {{ section_icons.get(sec_name, 'bi-image') }}"></i>
-  {{ sec_name|title }} Images
-  <span style="font-size:11px;font-weight:400;color:#bbb;font-family:sans-serif;text-transform:none;margin-left:4px">({{ fields|length }} image{{ 's' if fields|length != 1 }})</span>
-</div>
-<div class="row g-3 mb-2">
-{% for field in fields %}
-  {# Determine if there's a current image. Don't put base64 in value attr — too large #}
-  {% set has_val = field.value and field.value|length > 0 %}
-  {% set is_ext_url = has_val and (field.value.startswith('http://') or field.value.startswith('https://')) %}
-<div class="col-lg-6">
-  <div class="img-card" id="imgcard-{{ field.key }}">
-    <div class="img-preview-wrap" id="preview-{{ field.key }}">
-      {% if has_val %}
-        <img src="{{ field.value }}" alt="{{ field.label }}"
-             onerror="this.parentElement.innerHTML='<span class=\'no-img\'><i class=\'bi bi-broken-image\'></i></span>'">
-        <span class="img-badge">{% if is_ext_url %}url{% else %}saved{% endif %}</span>
-      {% else %}
-        <span class="no-img"><i class="bi bi-image"></i></span>
-      {% endif %}
-    </div>
-    <div class="img-meta">
-      <h6>{{ field.label }}</h6>
-      <p>{{ field.desc }}</p>
-      <div class="img-input-group">
-        <label class="img-file-btn" title="Upload from device">
-          <i class="bi bi-upload me-1"></i>Upload
-          <input type="file" accept="image/*" style="display:none"
-                 data-key="{{ field.key }}"
-                 onchange="handleImgFile(this)">
-        </label>
-        <span class="img-or">or</span>
-        {# Only pre-fill URL input for external http URLs, NOT base64 strings #}
-        <input type="url" class="img-url-input" id="url-{{ field.key }}"
-               placeholder="https://example.com/photo.jpg"
-               value="{{ field.value if is_ext_url else '' }}">
-        <button class="img-save-btn" data-key="{{ field.key }}" onclick="saveImg(this)">
-          <i class="bi bi-check-lg me-1"></i>Save
-        </button>
-        {% if has_val %}
-        <button class="img-clear-btn" data-key="{{ field.key }}" onclick="clearImg(this)" title="Remove image">
-          <i class="bi bi-x-lg"></i>
-        </button>
-        {% endif %}
-      </div>
-      <div id="status-{{ field.key }}" class="img-status"></div>
-      {% if has_val %}
-        <div class="upload-hint" id="hint-{{ field.key }}">
-          <i class="bi bi-{% if is_ext_url %}link-45deg{% else %}check-circle{% endif %} me-1"></i>
-          {% if is_ext_url %}Using external URL{% else %}Image saved{% endif %}
-        </div>
-      {% else %}
-        <div class="upload-hint" id="hint-{{ field.key }}">No image set</div>
-      {% endif %}
-    </div>
+{% for sec, fields in sections.items() %}
+<div class="im-section">
+  <div class="im-section-title">
+    <i class="bi {{ icons.get(sec,'bi-image') }}"></i>
+    {{ sec|title }}
   </div>
-</div>
-{% endfor %}
+  <div class="row g-3">
+  {% for f in fields %}
+    {% set has_img = f.value and f.value|length > 0 %}
+    {% set is_ext  = has_img and f.value.startswith('http') %}
+    <div class="col-xl-6">
+      <div class="im-card">
+
+        {# Thumbnail — always show current image if any #}
+        <div class="im-thumb" id="thumb-{{ f.key }}">
+          {% if has_img %}
+            <img src="{{ f.value }}" alt=""
+              onerror="this.parentElement.innerHTML='<span class=empty><i class=bi.bi-broken-image></i></span>'">
+          {% else %}
+            <span class="empty"><i class="bi bi-image"></i></span>
+          {% endif %}
+        </div>
+
+        <div class="im-body">
+          <h6>{{ f.label }}
+            {% if has_img %}
+              <span class="im-tag">{% if is_ext %}url{% else %}uploaded{% endif %}</span>
+            {% endif %}
+          </h6>
+          <p>{{ f.desc }}</p>
+
+          {# Hidden file input #}
+          <input type="file" accept="image/*" style="display:none"
+                 id="file-{{ f.key }}"
+                 onchange="onFileChosen('{{ f.key }}')">
+
+          <div class="im-row">
+            <label class="im-upload-btn" for="file-{{ f.key }}">
+              <i class="bi bi-upload me-1"></i>Upload file
+            </label>
+            <span style="font-size:11px;color:#ccc;font-weight:600">or</span>
+            <input type="url" class="im-url" id="url-{{ f.key }}"
+                   placeholder="https://example.com/image.jpg"
+                   value="{{ f.value if is_ext else '' }}">
+            <button class="im-save" id="btn-{{ f.key }}"
+                    onclick="doSave('{{ f.key }}')">
+              Save
+            </button>
+            {% if has_img %}
+            <button class="im-clear" onclick="doClear('{{ f.key }}')">
+              <i class="bi bi-x"></i>
+            </button>
+            {% endif %}
+          </div>
+          <div class="im-msg" id="msg-{{ f.key }}"></div>
+          <div style="font-size:11px;color:#bbb;margin-top:5px" id="hint-{{ f.key }}">
+            {% if has_img %}
+              {% if is_ext %}🔗 External URL set{% else %}✅ Image uploaded{% endif %}
+            {% else %}
+              No image set
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  {% endfor %}
+  </div>
 </div>
 {% endfor %}
 
 <script>
-// pendingFiles stores File objects keyed by field key
-const pendingFiles = {};
+// Holds chosen File objects before save — keyed by field key
+const chosen = {};
 
-function handleImgFile(input) {
-  const key = input.dataset.key;
-  const file = input.files[0];
+function onFileChosen(key) {
+  const input = document.getElementById('file-' + key);
+  const file  = input.files[0];
   if (!file) return;
-  pendingFiles[key] = file;
 
-  // Show preview immediately using FileReader
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const wrap = document.getElementById('preview-' + key);
-    wrap.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">'
-                   + '<span class="img-badge">new</span>';
-  };
-  reader.readAsDataURL(file);
-  setStatus(key, 'File ready — click Save to upload.', 'success');
-}
-
-async function saveImg(btn) {
-  const key = btn.dataset.key;
-  const urlInput = document.getElementById('url-' + key);
-  const urlVal = urlInput ? urlInput.value.trim() : '';
-  const hasFile = !!pendingFiles[key];
-  const hasUrl = urlVal.length > 0 && urlVal.startsWith('http');
-
-  if (!hasFile && !hasUrl) {
-    setStatus(key, 'Upload a file or enter a URL first.', 'error');
+  // Validate size client-side (4 MB)
+  if (file.size > 4 * 1024 * 1024) {
+    showMsg(key, 'File too large — max 4 MB.', 'err');
+    input.value = '';
     return;
   }
 
-  btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Saving…';
+  chosen[key] = file;
+
+  // Live-preview the chosen file
+  const reader = new FileReader();
+  reader.onload = e => {
+    const thumb = document.getElementById('thumb-' + key);
+    thumb.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
+  };
+  reader.readAsDataURL(file);
+
+  // Clear URL field — file takes priority
+  const urlEl = document.getElementById('url-' + key);
+  if (urlEl) urlEl.value = '';
+
+  showMsg(key, 'File selected — click Save.', 'ok');
+}
+
+async function doSave(key) {
+  const urlEl  = document.getElementById('url-' + key);
+  const urlVal = urlEl ? urlEl.value.trim() : '';
+  const file   = chosen[key];
+
+  // Must have either a file or a URL
+  if (!file && !urlVal) {
+    showMsg(key, 'Choose a file or enter a URL first.', 'err');
+    return;
+  }
+
+  // If URL provided, must start with http
+  if (!file && urlVal && !urlVal.startsWith('http')) {
+    showMsg(key, 'URL must start with http:// or https://', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('btn-' + key);
   btn.disabled = true;
+  btn.textContent = 'Saving…';
 
   const fd = new FormData();
   fd.append('field_key', key);
-
-  if (hasFile) {
-    fd.append('image_file', pendingFiles[key]);
+  if (file) {
+    fd.append('image_file', file);   // sends the actual File object
   } else {
     fd.append('image_url', urlVal);
   }
 
   try {
-    const r = await fetch('{{ url_for("admin.save_image") }}', { method: 'POST', body: fd });
-    const d = await r.json();
+    const resp = await fetch('{{ url_for("admin.save_image") }}', {
+      method: 'POST',
+      body: fd
+      // Do NOT set Content-Type — browser sets it with boundary for multipart
+    });
 
-    if (d.success) {
-      delete pendingFiles[key];
-      setStatus(key, '✓ Saved! Refreshing preview…', 'success');
-      // Reload page after short delay so preview shows saved image from DB
-      setTimeout(() => { window.location.reload(); }, 800);
+    const json = await resp.json();
+
+    if (json.success) {
+      delete chosen[key];
+      showMsg(key, '✓ Saved successfully!', 'ok');
+
+      const hint = document.getElementById('hint-' + key);
+      if (hint) hint.textContent = json.is_data_url ? '✅ Image uploaded' : '🔗 External URL set';
+
+      // Reload after short delay so page reflects new DB state
+      setTimeout(() => location.reload(), 1200);
     } else {
-      setStatus(key, d.message || 'Save failed.', 'error');
+      showMsg(key, json.message || 'Save failed.', 'err');
     }
-  } catch(e) {
-    setStatus(key, 'Network error — try again.', 'error');
+  } catch (err) {
+    showMsg(key, 'Network error — try again.', 'err');
   }
 
-  btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Save';
   btn.disabled = false;
+  btn.textContent = 'Save';
 }
 
-async function clearImg(btn) {
-  const key = btn.dataset.key;
+async function doClear(key) {
   if (!confirm('Remove this image?')) return;
 
   const fd = new FormData();
   fd.append('field_key', key);
 
-  try {
-    const r = await fetch('{{ url_for("admin.clear_image") }}', { method: 'POST', body: fd });
-    const d = await r.json();
-    if (d.success) {
-      document.getElementById('preview-' + key).innerHTML =
-        '<span class="no-img"><i class="bi bi-image"></i></span>';
-      const urlInput = document.getElementById('url-' + key);
-      if (urlInput) urlInput.value = '';
-      delete pendingFiles[key];
-      const hint = document.getElementById('hint-' + key);
-      if (hint) hint.innerHTML = 'No image set';
-      setStatus(key, 'Image cleared.', 'success');
-    }
-  } catch(e) {
-    setStatus(key, 'Error clearing image.', 'error');
+  const resp = await fetch('{{ url_for("admin.clear_image") }}', {
+    method: 'POST', body: fd
+  });
+  const json = await resp.json();
+
+  if (json.success) {
+    document.getElementById('thumb-' + key).innerHTML =
+      '<span class="empty"><i class="bi bi-image"></i></span>';
+    const urlEl = document.getElementById('url-' + key);
+    if (urlEl) urlEl.value = '';
+    delete chosen[key];
+    document.getElementById('hint-' + key).textContent = 'No image set';
+    showMsg(key, 'Image removed.', 'ok');
   }
 }
 
-function setStatus(key, msg, type) {
-  const el = document.getElementById('status-' + key);
+function showMsg(key, text, type) {
+  const el = document.getElementById('msg-' + key);
   if (!el) return;
-  el.textContent = msg;
-  el.className = 'img-status ' + type;
-  setTimeout(() => { el.style.display = 'none'; el.className = 'img-status'; }, 4000);
+  el.textContent = text;
+  el.className = 'im-msg ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => {
+    el.className = 'im-msg';
+    el.style.display = 'none';
+  }, 4000);
 }
 </script>
 {% endblock %}
